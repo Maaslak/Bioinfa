@@ -1,0 +1,42 @@
+\documentclass{article}
+\title{Sprawozdanie 1 \\ Teoretyczne opracowanie metody heurystycznej}
+\date{2018-04-08}
+\author{Mateusz Babiaczyk, Bartosz Nawrotek}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+
+\begin{document}
+\maketitle
+\section{Wprowadzenie teoretyczne}
+Do rozwiązania problemu zastosowaliśmy algorytm genetyczny.
+\subsection{Kodowanie}
+Osobniki są kodowane jako wektory liczb całkowitych w których indeks oznacza kolejność występowania oligonukleotydu w sekwencji:
+\begin{equation}
+	X = [ x_{1}, x_{2}, \ldots , x_{m}] , 
+\end{equation}
+gdzie:
+\begin{enumerate}
+	\item $m$ - wielkość zbioru dostępnych oligonukleotydów
+	\item $x_{i}$ dla $i \in \langle1, m\rangle$ - indeks oligonukleotydu w liście dostępnych oligonukleotydów
+\end{enumerate}
+Jako rozwiązanie będziemy traktować sekwencje zbudowaną z oligonukleotydów począwszy od $x_{1}$ nie przekraczającą długości $n$.
+\subsection{Funkcja oceny}
+Jako minimalizowaną funkcję oceny osobnika przyjęliśmy następującą postać addytywną:
+\begin{equation}
+	f_{min}(X) = \sum_{i = 1}^{i = k - 1}{[2len(x_{i}, x_{i+1}) - l + 1]} + \sum_{i = k}^{i = m - 1}{[len(x_{i}, x_{i+1})- l + 1]}
+\end{equation}
+gdzie:
+\begin{enumerate}
+	\item $k$ - taka liczba całkowita, dla której długość sekwencji $[x_{1}, x_{2}, \ldots , x_{k}]$ będącej złożeniem $k$ pierwszych oligonukleotydów osobnika $X$ jest mniejsza lub równa $n$
+	\item $len(x, y)$ jest długością sekwencji otrzymanej z połączenia oligonukleotydów $x$ oraz $y$
+	\item l - długość oligonukleotydu
+\end{enumerate}
+Przyjmując funkcję kosztu powyższej postaci pragnęliśmy zwrócić szczególną uwagę na pierwsze k oligonukleotydów z osobnika, które zawierają szukane rozwiązanie. Druga część sumy ma na celu nie losowe uporządkowanie pozostałych oligonukleotydów, które będą wykożystane w operacji krzyżowania
+\end{document}
