@@ -15,7 +15,7 @@
 \begin{document}
 \maketitle
 \section{Wprowadzenie}
-Do rozwiązania problemu zastosowano hybrydę algorytmu genetycznego.
+Sekwencjonowanie DNA polega na odczytywaniu sekwencji, czyli kolejności par nukleotydowych w cząsteczce DNA. Obejmuje ona dowolną metodę lub technologię, która jest stosowana do określenia porządku czterech zasad: adeniny, guaniny, cytozyny i tyminy w nici DNA.  \\Do rozwiązania problemu zastosowano hybrydę algorytmu genetycznego.
 \section{Opis algorytmu}
 \subsection{Kodowanie}
 Osobniki są kodowane jako wektory liczb całkowitych w których indeks oznacza kolejność występowania oligonukleotydu w sekwencji:
@@ -63,6 +63,9 @@ $s$,
 $c$,
 $u$
 wyznaczony będzie eksperymentalnie przez algorytm najszybszego spadku gradientu.
+\subsection{Błędy jednego typu}
+W przypadku występowania tylko błędów negatywnych w problemie, dodatkową informacją jest to, iż długość sekwencji zbudowanej z olinukleotydów będzie mniejsza lub równa $n$. Wtedy wystarczyło by usunąć w naszej metodzie możliwość wychodzenia poza tą długość. \\
+W przypadku występowania tylko błędów pozytywnych, można by było odrzucać nukleotydy które kompletnie nie pasują do naszego ciągu, ale takie których brak nic nie zmieni. Prawdopodobnie takie nukleotydy byłyby właśnie tymi błędami.  
 \end{document}
 
 
