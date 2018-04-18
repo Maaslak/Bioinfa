@@ -29,7 +29,7 @@ gdzie:
 \end{enumerate}
 Jako rozwiązanie zostanie traktowana sekwencja zbudowana z oligonukleotydów począwszy od $x_{1}$ nie przekraczająca długości $n$.
 \subsection{Generowanie populacji początkowej}
-Tworzone jest $s$ - osobników, gdzie $s$ jest połową wielkości zbioru oligonukleotydów.
+Tworzone jest $s$ - osobników.
 Osobniki są permutacjami liczb całkowitych.
 \subsection{Funkcja oceny}
 Jako minimalizowaną funkcję oceny osobnika przyjęto następującą postać addytywną:
@@ -54,9 +54,15 @@ Fragmenty uzupełniane są od drugiego punktu krzyżowania, następnie uzupełni
 Pomija się oligonukleotydy, które w potomku już występują.
 Uzupełnia się rozwiązanie o brakujące oligonukleotydy dobierając miejsca z najmniejszym pogorszeniem funkcji celu.
 \subsection{Mutacje}
-Osobniki wybierane są losowo zarówno z populacji przodków, jak i potomków. Następnie, dla danego osobnika wybiera się oligonukleotyd najsłabiej pasujący do sąsiednich oligonukleotydów, który zamieniany jest miejscem z oligonukleotydem sąsiednim w taki sposób aby minimalizować funkcję kosztu. Zabieg ten ma na celu przyspieszenie zbiegania rozwiązań do optimum.
+Osobniki wybierane są losowo zarówno z populacji przodków, jak i potomków. Następnie, dla danego osobnika wybiera się oligonukleotyd najsłabiej pasujący do sąsiednich oligonukleotydów, który zamieniany jest miejscem z oligonukleotydem sąsiednim w taki sposób aby minimalizować funkcję kosztu. Zabieg ten ma na celu przyspieszenie zbiegania rozwiązań do optimum. Prawdopodobieństwo występowania mutacji jest równe $u$ razy wielkość instancji.
 \subsection{Wybór nowej populacji}
 Wybór nowej populacji polegać będzie na zachowaniu $d$ chromosomów z populacji rodziców oraz wszystkich chromosomów z populacji potomków. Gdzie $d$ jest stałą zapewniającą brak zmiany wielkości populacji.
+\subsection{Dobór parametrów algorytmu}
+Dobór parametrów algorytmu:
+$s$,
+$c$,
+$u$
+wyznaczony będzie eksperymentalnie przez algorytm najszybszego spadku gradientu.
 \end{document}
 
 
