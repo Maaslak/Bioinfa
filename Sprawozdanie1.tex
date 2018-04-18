@@ -14,8 +14,9 @@
 
 \begin{document}
 \maketitle
-\section{Wprowadzenie teoretyczne}
-Do rozwiązania problemu zastosowaliśmy algorytm genetyczny.
+\section{Wprowadzenie}
+Do rozwiązania problemu zastosowano hybrydę algorytmu genetycznego.
+\section{Opis algorytmu}
 \subsection{Kodowanie}
 Osobniki są kodowane jako wektory liczb całkowitych w których indeks oznacza kolejność występowania oligonukleotydu w sekwencji:
 \begin{equation}
@@ -23,20 +24,39 @@ Osobniki są kodowane jako wektory liczb całkowitych w których indeks oznacza 
 \end{equation}
 gdzie:
 \begin{enumerate}
-	\item $m$ - wielkość zbioru dostępnych oligonukleotydów
-	\item $x_{i}$ dla $i \in \langle1, m\rangle$ - indeks oligonukleotydu w liście dostępnych oligonukleotydów
+	\item $m$ - wielkość zbioru dostępnych oligonukleotydów,
+	\item $x_{i}$ dla $i \in \langle1, m\rangle$ - indeks oligonukleotydu w liście dostępnych oligonukleotydów.
 \end{enumerate}
-Jako rozwiązanie będziemy traktować sekwencje zbudowaną z oligonukleotydów począwszy od $x_{1}$ nie przekraczającą długości $n$.
+Jako rozwiązanie zostanie traktowana sekwencja zbudowana z oligonukleotydów począwszy od $x_{1}$ nie przekraczająca długości $n$.
+\subsection{Generowanie populacji początkowej}
+Tworzone jest $s$ - osobników, gdzie $s$ jest połową wielkości zbioru oligonukleotydów.
+Osobniki są permutacjami liczb całkowitych.
 \subsection{Funkcja oceny}
-Jako minimalizowaną funkcję oceny osobnika przyjęliśmy następującą postać addytywną:
+Jako minimalizowaną funkcję oceny osobnika przyjęto następującą postać addytywną:
 \begin{equation}
-	f_{min}(X) = \sum_{i = 1}^{i = k - 1}{[2len(x_{i}, x_{i+1}) - l + 1]} + \sum_{i = k}^{i = m - 1}{[len(x_{i}, x_{i+1})- l + 1]}
+	f_{min}(X) = 1,5\sum_{i = 1}^{i = k - 1}{[len(x_{i}, x_{i+1}) - l + 1]} + \sum_{i = k}^{i = m - 1}{[len(x_{i}, x_{i+1})- l + 1]}
 \end{equation}
 gdzie:
 \begin{enumerate}
-	\item $k$ - taka liczba całkowita, dla której długość sekwencji $[x_{1}, x_{2}, \ldots , x_{k}]$ będącej złożeniem $k$ pierwszych oligonukleotydów osobnika $X$ jest mniejsza lub równa $n$
-	\item $len(x, y)$ jest długością sekwencji otrzymanej z połączenia oligonukleotydów $x$ oraz $y$
-	\item l - długość oligonukleotydu
+	\item $k$ - taka liczba całkowita, dla której długość sekwencji $[x_{1}, x_{2}, \ldots , x_{k}]$ będącej złożeniem $k$ pierwszych oligonukleotydów osobnika $X$ jest mniejsza lub równa $n$,
+	\item $len(x, y)$ jest długością sekwencji otrzymanej z połączenia oligonukleotydów $x$ oraz $y$,
+	\item l - długość oligonukleotydu.
 \end{enumerate}
-Przyjmując funkcję kosztu powyższej postaci pragnęliśmy zwrócić szczególną uwagę na pierwsze k oligonukleotydów z osobnika, które zawierają szukane rozwiązanie. Druga część sumy ma na celu nie losowe uporządkowanie pozostałych oligonukleotydów, które będą wykorzystane w operacji krzyżowania
+Przyjmując funkcję kosztu powyższej postaci zwrócono szczególną uwagę na pierwsze $k$ oligonukleotydów z osobnika, które zawierają szukane rozwiązanie. Druga część sumy ma na celu nielosowe uporządkowanie pozostałych oligonukleotydów, które będą wykorzystane w operacji krzyżowania.
+\pagebreak
+\subsection{Wybór osobników do krzyżowania}
+Losuje się $c$ osobników z populacji.
+Dla trójek kolejnych osobników wybiera się z nich tego o najniższej funkcji oceny, następnie jest on dodawany do populacji rodzicielskiej.
+\subsection{Krzyżowanie}
+Krzyżowanie będzie odbywało się metodą podobną do \textit{krzyżowania z zachowaniem porządku}.
+Losowane są dwa punkty. Do pierwszego potomka kopiowany jest fragment pomiędzy punktami krzyżowania z pierwszego rodzica.
+Fragmenty uzupełniane są od drugiego punktu krzyżowania, następnie uzupełniany jest początek chromosomu. Przyjęto tę metodę, aby rozwiązania po krzyżowaniu nadal należały do zbioru rozwiązań dopuszczalnych. Dodatkową zaletą tej metody jest występowanie stosunkowo niewielkich  zmian w kolejności oligonukleotydów, co potencjalnie zmniejszy ryzyko utraty ciągów dokładnych dopasowań. W naszym rozwiązaniu jednak zdecydowano się na modyfikację fazy uzupełniania chromosomu w stosunku do \textit{krzyżowania z zachowaniem porządku}. 
+Pomija się oligonukleotydy, które w potomku już występują.
+Uzupełnia się rozwiązanie o brakujące oligonukleotydy dobierając miejsca z najmniejszym pogorszeniem funkcji celu.
+\subsection{Mutacje}
+Osobniki wybierane są losowo zarówno z populacji przodków, jak i potomków. Następnie, dla danego osobnika wybiera się oligonukleotyd najsłabiej pasujący do sąsiednich oligonukleotydów, który zamieniany jest miejscem z oligonukleotydem sąsiednim w taki sposób aby minimalizować funkcję kosztu. Zabieg ten ma na celu przyspieszenie zbiegania rozwiązań do optimum.
+\subsection{Wybór nowej populacji}
+Wybór nowej populacji polegać będzie na zachowaniu $d$ chromosomów z populacji rodziców oraz wszystkich chromosomów z populacji potomków. Gdzie $d$ jest stałą zapewniającą brak zmiany wielkości populacji.
 \end{document}
+
+
