@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const int l = 10, s = 0, c = 209, u = 0;
+const int l = 10, s = 0, c = 209, u = 0, d = 0;
 vector<char*> oligonucleotydes;
 int** costMatrix = NULL;
 int** population = NULL;
@@ -36,6 +36,14 @@ void parseInput(char* filepath) {
 void clearVec(vector<char*> vec) {
 	while (!vec.empty()) {
 		char* el = vec.back();
+		delete(el);
+		vec.pop_back();
+	}
+}
+
+void clearVec2(vector<int*> vec) {
+	while (!vec.empty()) {
+		int* el = vec.back();
 		delete(el);
 		vec.pop_back();
 	}
@@ -156,7 +164,7 @@ int* chooseIndividuals(int c) {
 	return finalLot;
 }
 
-int findBestIndividual() {
+int findTheBestIndividual() {
 	int min = INT_MAX, id = -1;;
 	for (int i = 0; i < populationSize; i++) {
 		if (goalFunctionValues[i] < min) {
@@ -167,8 +175,21 @@ int findBestIndividual() {
 	return id;
 }
 
+int findTheWorstIndividual() {
+	int max = INT_MIN, id = -1;;
+	for (int i = 0; i < populationSize; i++) {
+		if (goalFunctionValues[i] > max) {
+			max = goalFunctionValues[i];
+			id = i;
+		}
+	}
+	return id;
+}
+
 //Start crossing (do dokończenia)
 void crossing(int c) {
+	vector<int*> newPopulation;
+
 	goalFunction(n);
 	int* finalLot = chooseIndividuals(c);
 	int* individual1 = new int[oligonucleotydes.size()];
@@ -191,7 +212,11 @@ void crossing(int c) {
 		}
 
 		int tmp = endRand + 1;
-		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {			
+		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {	
+			if (tmp < oligonucleotydes.size())
+				tmp++;
+			else
+				tmp = 0;
 			bool recap = false;
 			for (int k = 0; k < oligonucleotydes.size(); k++) {
 				if (individual1[k] == population[finalLot[i + 1]][tmp])
@@ -203,17 +228,14 @@ void crossing(int c) {
 			else {
 				j--;
 			}
-
-			if (tmp < oligonucleotydes.size() - 1)
-				tmp++;
-			else
-				tmp = 0;
-
-			printf("Petla1: \n");
 		}
 
 		tmp = endRand + 1;
 		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {
+			if (tmp < oligonucleotydes.size())
+				tmp++;
+			else
+				tmp = 0;
 			bool recap = false;
 			for (int k = 0; k < oligonucleotydes.size(); k++) {
 				if (individual2[k] == population[finalLot[i]][tmp])
@@ -225,13 +247,6 @@ void crossing(int c) {
 			else {
 				j--;
 			}
-
-			if (tmp < oligonucleotydes.size() - 1)
-				tmp++;
-			else
-				tmp = 0;
-
-			printf("Petla2: \n");
 		}
 
 		tmp = 0;
@@ -252,7 +267,6 @@ void crossing(int c) {
 			}
 			else
 				break;
-			printf("Petla3: \n");
 		}
 
 		tmp = 0;
@@ -273,10 +287,9 @@ void crossing(int c) {
 			}
 			else
 				break;
-			printf("Petla4: \n");
 		}
 
-		printf("Individual1: \n");
+		/*printf("Individual1: \n");
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			printf("%d ", individual1[j]);
 		}
@@ -296,11 +309,28 @@ void crossing(int c) {
 			printf("%d ", population[finalLot[i + 1]][j]);
 		}
 		printf("\nstartRand : %d\n", startRand);
-		printf("\nendRand : %d\n", endRand);
+		printf("\nendRand : %d\n", endRand);*/
 
-		//int bestOne = findBestIndividual();
-		//swap(population[i], population[bestOne]);
+		newPopulation.push_back(individual1);
+		newPopulation.push_back(individual2);
 	}
+	int i = 0;
+	int id = findTheBestIndividual();
+	swap(population[0], population[id]);
+
+	while (newPopulation.size() < populationSize) {
+		newPopulation.push_back(population[i]);
+		i++;
+	}
+
+	for (int k = 0; k < populationSize; k++) {
+		for (int j = 0; j < oligonucleotydes.size(); j++) {
+			population[k][j] = newPopulation[k][j];
+			printf("%d ", population[k][j]);
+		}
+		printf("\n");
+	}
+	vector<int*>().swap(newPopulation);
 }
 
 
