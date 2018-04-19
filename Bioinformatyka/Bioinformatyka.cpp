@@ -7,14 +7,17 @@
 #include <fstream>
 #include <list>
 #include <time.h>
+#include <algorithm>
+#include <stdlib.h>
 
 using namespace std;
 
-const int l = 10, s, c, u;
+const int l = 10, s = 0, c = 0, u = 0;
 vector<char*> oligonucleotydes;
 int** costMatrix;
+int ** population;
 
-void parseInput(char* filepath) {
+void parseInput(char* filepath) {	
 	FILE* file = fopen(filepath, "r");
 	char* el;
 	char oligonucleotyde[l + 1];
@@ -73,19 +76,38 @@ void initCostMatrix() {
 void initialize(char* problemPath) {
 	parseInput(problemPath);
 	initCostMatrix();
+	
+}
+
+void createPopulation() {
+	population = new int*[oligonucleotydes.size()/2];
+	for (int i = 0; i < oligonucleotydes.size(); i++)
+		population[i] = new int[oligonucleotydes.size()];
+	for (int i = 0; i < oligonucleotydes.size()/2; i++) {
+		for (int j = 0; j < oligonucleotydes.size(); j++) {
+			population[i][j] = j;			
+		}
+		random_shuffle(&population[i][0], &population[i][oligonucleotydes.size()]);
+	}
+			
 }
 
 
 void clear() {
-	for (int i = 0; i < oligonucleotydes.size(); i++)
+	for (int i = 0; i < oligonucleotydes.size(); i++) {
 		delete(costMatrix[i]);
+		//delete(population[i]);
+	}
 	delete(costMatrix);
+	//delete(population);
 	clearVec(oligonucleotydes);
 }
 
 int main()
 {
+	srand(time(0));
 	initialize("9200-40.txt");
+	createPopulation();
 	clear();
 	system("pause");
     return 0;
