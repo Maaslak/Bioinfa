@@ -10,7 +10,7 @@
 
 using namespace std;
 
-const int l = 10;
+const int l = 10, s, c, u;
 vector<char*> oligonucleotydes;
 int** costMatrix;
 
@@ -40,9 +40,9 @@ void printVec(vector<char*> vec) {
 		printf("%s\n", vec[i]);
 }
 
-// Calculates len of connection two specyfic oligonucleotydes
+// Calculates len of connection of two specific oligonucleotydes
 int calcLen(char* a, char* b) {
-	int len = 2*l;
+	int len = l;
 	for (int i = 0; i < l-1; i++)
 	{
 		bool fit = true;
@@ -68,11 +68,13 @@ void initCostMatrix() {
 	for (int i = 0; i < oligonucleotydes.size(); i++)
 		for (int j = 0; j < oligonucleotydes.size(); j++)
 			costMatrix[i][j] = calcLen(oligonucleotydes[i], oligonucleotydes[j]);
+	}
 }
 void initialize(char* problemPath) {
 	parseInput(problemPath);
 	initCostMatrix();
 }
+
 
 void clear() {
 	for (int i = 0; i < oligonucleotydes.size(); i++)
