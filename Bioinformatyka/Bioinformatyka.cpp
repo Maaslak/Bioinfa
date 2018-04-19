@@ -15,7 +15,9 @@ using namespace std;
 const int l = 10, s = 0, c = 0, u = 0;
 vector<char*> oligonucleotydes;
 int** costMatrix;
-int ** population;
+int** population;
+int* goalFunctionValues;
+int populationSize;
 
 void parseInput(char* filepath) {	
 	FILE* file = fopen(filepath, "r");
@@ -79,27 +81,48 @@ void initialize(char* problemPath) {
 	
 }
 
-void createPopulation() {
-	population = new int*[oligonucleotydes.size()/2];
-	for (int i = 0; i < oligonucleotydes.size(); i++)
+void createPopulation(int div = 2) {
+	population = new int*[oligonucleotydes.size()/ div];
+	populationSize = oligonucleotydes.size() / div;
+	for (int i = 0; i < oligonucleotydes.size()/ div; i++)
 		population[i] = new int[oligonucleotydes.size()];
-	for (int i = 0; i < oligonucleotydes.size()/2; i++) {
+	for (int i = 0; i < oligonucleotydes.size()/ div; i++) {
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			population[i][j] = j;			
 		}
 		random_shuffle(&population[i][0], &population[i][oligonucleotydes.size()]);
 	}
-			
+}
+
+void goalFunction(int n) {
+	goalFunctionValues = new int[populationSize];
+	for (int i = 0; i < populationSize; i++) {
+		int sum1 = 0, sum2 = 0, len = 0;
+		for (int j = 0; j < oligonucleotydes.size() - 1; j++) {
+			if (len <= n) {
+				sum1 += costMatrix[population[i][j]][population[i][j + 1]];
+				len += costMatrix[population[i][j]][population[i][j + 1]];
+			}
+			else {
+				sum2 += costMatrix[population[i][j]][population[i][j + 1]];
+			}
+		}
+		goalFunctionValues[i] = int(1.5*sum1) + sum2;
+		printf("%d\n", goalFunctionValues[i]);
+	}
 }
 
 
 void clear() {
 	for (int i = 0; i < oligonucleotydes.size(); i++) {
 		delete(costMatrix[i]);
-		//delete(population[i]);
+	}
+	for (int i = 0; i < oligonucleotydes.size()/2; i++) {
+		delete(population[i]);
 	}
 	delete(costMatrix);
-	//delete(population);
+	delete(population);
+	delete(goalFunctionValues);
 	clearVec(oligonucleotydes);
 }
 
@@ -108,6 +131,7 @@ int main()
 	srand(time(0));
 	initialize("9200-40.txt");
 	createPopulation();
+	goalFunction(209);
 	clear();
 	system("pause");
     return 0;
