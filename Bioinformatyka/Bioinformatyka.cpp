@@ -68,7 +68,7 @@ void initCostMatrix() {
 	for (int i = 0; i < oligonucleotydes.size(); i++)
 		for (int j = 0; j < oligonucleotydes.size(); j++)
 			costMatrix[i][j] = calcLen(oligonucleotydes[i], oligonucleotydes[j]);
-	}
+	
 }
 void initialize(char* problemPath) {
 	parseInput(problemPath);
