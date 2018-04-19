@@ -45,7 +45,7 @@ void printVec(vector<char*> vec) {
 		printf("%s\n", vec[i]);
 }
 
-// Calculates len of connection of two specific oligonucleotydes
+// Calculates len of connection of two specific oligonucleotydes (powinno być chyba że porównujesz początek pierwszego z końcem 2 a nie początek z początkiem chyba że czegoś nie czaje 
 int calcLen(char* a, char* b) {
 	int len = l;
 	for (int i = 0; i < l-1; i++)
@@ -94,6 +94,7 @@ void createPopulation(int div = 2) {
 	}
 }
 
+//create table with values of Goal function answering positions of individuals in population (tested, working)
 void goalFunction(int n) {
 	goalFunctionValues = new int[populationSize];
 	for (int i = 0; i < populationSize; i++) {
@@ -108,8 +109,54 @@ void goalFunction(int n) {
 			}
 		}
 		goalFunctionValues[i] = int(1.5*sum1) + sum2;
-		printf("%d\n", goalFunctionValues[i]);
 	}
+}
+
+
+
+//Choose individuals to parental population (tested, working)
+void chooseIndividuals(int c) {
+	c = c - c % 3; 
+	int* lot = new int[c];
+	for (int j = 0; j < c; j++) {
+		lot[j] = -1;
+	}
+	for (int i = 0; i < c; i++) {
+		int rng = rand() % populationSize;
+		bool recap = false;
+		for (int j = 0; j < c; j++) {
+			if (lot[j] == rng) {
+				recap = true;
+				break;
+			}
+		}
+		if (!recap) {
+			lot[i] = rng;
+			printf("%d ", lot[i]);
+		}
+		else {
+			i--;
+		}
+	}
+	int* finalLot = new int[c/3];
+	for (int j = 0; j < c/3; j++) {
+		finalLot[j] = -1;
+	}
+
+	for (int i = 0; i < c - 2; i+=3) {
+		if (goalFunctionValues[lot[i]] <= goalFunctionValues[lot[i + 1]] && goalFunctionValues[lot[i]] <= goalFunctionValues[lot[i + 2]]) {
+			finalLot[i/3] = lot[i];
+		}else if (goalFunctionValues[lot[i]] >= goalFunctionValues[lot[i + 1]] && goalFunctionValues[lot[i + 1]] <= goalFunctionValues[lot[i + 2]]) {
+			finalLot[i/3] = lot[i + 1];
+		}else if (goalFunctionValues[lot[i]] >= goalFunctionValues[lot[i + 2]] && goalFunctionValues[lot[i + 1]] >= goalFunctionValues[lot[i + 2]]) {
+			finalLot[i/3] = lot[i + 2];
+		}
+	}
+}
+
+//Start crossing (do dokończenia)
+void crossing(int c) {
+	chooseIndividuals(c);
 }
 
 
@@ -132,6 +179,7 @@ int main()
 	initialize("9200-40.txt");
 	createPopulation();
 	goalFunction(209);
+	crossing(20);
 	clear();
 	system("pause");
     return 0;
