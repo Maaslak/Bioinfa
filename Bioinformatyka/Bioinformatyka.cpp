@@ -105,7 +105,7 @@ void createPopulation(int div = 2) {
 
 //create table with values of Goal function answering positions of individuals in population (tested, working)
 void goalFunction(int n) {
-	//if(goalFunctionValues != NULL)
+	if(goalFunctionValues == NULL)
 		goalFunctionValues = new int[populationSize];
 	for (int i = 0; i < populationSize; i++) {
 		int sum1 = 0, sum2 = 0, len = 0;
@@ -225,6 +225,8 @@ void crossing(int c) {
 			int *result = find(individual1, end, population[i + 1][tmp]);
 			if (result == end) {
 				individual1[j] = population[finalLot[i + 1]][tmp];
+				if (individual1[j] >= oligonucleotydes.size() || individual1[j] < 0)
+					printf("\nERROR:  petla1-- i+1: %d, j: %d, value: %d, tmp: %d", i+1, j, individual1[j], tmp);
 			}
 			else {
 				j--;
@@ -240,6 +242,8 @@ void crossing(int c) {
 			int *result = find(individual2, end, population[i][tmp]);
 			if (result == end) {
 				individual2[j] = population[finalLot[i]][tmp];
+				if (individual2[j] >= oligonucleotydes.size() || individual2[j] < 0)
+					printf("\nERROR:  petla2-- i: %d, j: %d, value: %d, tmp: %d", i, j, individual2[j], tmp);
 			}
 			else {
 				j--;
@@ -248,11 +252,16 @@ void crossing(int c) {
 
 		tmp = 0;
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
+			tmp++;
+			if (tmp >= oligonucleotydes.size())
+				tmp = 0;
 			if (individual2[j] == -1) {
 				int *end = individual2 + oligonucleotydes.size();
 				int *result = find(individual2, end, population[i][tmp]);
 				if (result == end) {
 					individual2[j] = population[finalLot[i]][tmp];
+					if (individual2[j] >= oligonucleotydes.size() || individual2[j] < 0)
+						printf("\nERROR:  petla3-- i: %d, j: %d, value: %d, tmp: %d", i, j, individual2[j], tmp);
 				}
 				else {
 					j--;
@@ -265,11 +274,16 @@ void crossing(int c) {
 
 		tmp = 0;
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
+			tmp++;
+			if (tmp >= oligonucleotydes.size())
+				tmp = 0;
 			if (individual1[j] == -1) {
 				int *end = individual1 + oligonucleotydes.size();
 				int *result = find(individual1, end, population[i + 1][tmp]);
 				if (result == end) {
 					individual1[j] = population[finalLot[i + 1]][tmp];
+					if (individual1[j] >= oligonucleotydes.size() || individual1[j] < 0)
+						printf("\nERROR:  petla4-- i+1: %d, j: %d, value: %d, tmp: %d", i + 1, j, individual1[j], tmp);
 				}
 				else {
 					j--;
@@ -306,19 +320,25 @@ void crossing(int c) {
 		newPopulation.push_back(individual2);
 	}
 
-	int i = 0;
+	int iter = 0;
 	int id = findTheBestIndividual();
 	swap(population[0], population[id]);
 
 	while (newPopulation.size() < populationSize) {
-		newPopulation.push_back(population[i]);
-		i++;
+		newPopulation.push_back(population[iter]);
+		iter++;
 	}
-
+	
 	for (int i = 0; i < populationSize; i++) {
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			population[i][j] = newPopulation[i][j];
 			printf("%d ", population[i][j]);
+			
+		}
+		int *end = population[i] + oligonucleotydes.size();
+		int *result = find(population[i], end, 0);
+		if (result == end) {
+			printf("\nNie ma zera w %d!!!", i);
 		}
 		printf("\n");
 	}
