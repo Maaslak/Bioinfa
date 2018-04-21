@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const int l = 10, s = 0, c = 209, u = 0, d = 0;
+const int l = 10, s = 80, c = 209, u = 5, d = 0;
 vector<char*> oligonucleotydes;
 int** costMatrix = NULL;
 int** population = NULL;
@@ -90,13 +90,13 @@ void initialize(char* problemPath) {
 	
 }
 
-void createPopulation(int div = 2) {
-	population = new int*[oligonucleotydes.size()/ div];
-	populationSize = oligonucleotydes.size() / div;
-	for (int i = 0; i < oligonucleotydes.size()/ div; i++)
-		population[i] = new int[oligonucleotydes.size()];
-	for (int i = 0; i < oligonucleotydes.size()/ div; i++) {
-		for (int j = 0; j < oligonucleotydes.size(); j++) {
+void createPopulation(int s) {
+	population = new int*[s];
+	populationSize = s;
+	for (int i = 0; i < s; i++)
+		population[i] = new int[s];
+	for (int i = 0; i < s; i++) {
+		for (int j = 0; j < s; j++) {
 			population[i][j] = j;			
 		}
 		random_shuffle(&population[i][0], &population[i][oligonucleotydes.size()]);
@@ -184,6 +184,43 @@ int findTheWorstIndividual() {
 		}
 	}
 	return id;
+}
+
+
+//tylko na rodzicach, do poprawy
+void mutation(int u) {
+	for (int i = 1; i < s; i++) {
+		int rnd = rand() % 100;
+		if (rnd < 5) {
+			int max = INT_MIN, id = -1;
+			for (int j = 0; j < oligonucleotydes.size() - 1; j++) {
+				if (calcLen(oligonucleotydes[population[i][j]], oligonucleotydes[population[i][j + 1]]) > max) {
+					max = calcLen(oligonucleotydes[population[i][j]], oligonucleotydes[population[i][j + 1]]);
+					id = j;
+				}
+			}
+			int tmp1, tmp2;
+			if (id == oligonucleotydes.size() - 1) {
+				tmp1 = 0;
+			}
+			else {
+				tmp1++;
+			}
+
+			if (id == 0) {
+				tmp2++;
+			}
+			else {
+				tmp2 = oligonucleotydes.size() - 1;
+			}
+			if (calcLen(oligonucleotydes[population[i][id]], oligonucleotydes[population[i][tmp1]]) - calcLen(oligonucleotydes[population[i][tmp1]], oligonucleotydes[population[i][id]]) > calcLen(oligonucleotydes[population[i][tmp2]], oligonucleotydes[population[i][id]]) - calcLen(oligonucleotydes[population[i][id]], oligonucleotydes[population[i][tmp2]])) {
+				swap(oligonucleotydes[population[i][id]], oligonucleotydes[population[i][tmp1]]);
+			}
+			else {
+				swap(oligonucleotydes[population[i][id]], oligonucleotydes[population[i][tmp2]]);
+			}
+		}
+	}
 }
 
 //Start crossing (do dokończenia)
@@ -321,6 +358,7 @@ void crossing(int c) {
 	int iter = 0;
 	int id = findTheBestIndividual();
 	swap(population[0], population[id]);
+	mutation(u);
 
 	while (newPopulation.size() < populationSize) {
 		newPopulation.push_back(population[iter]);
@@ -340,8 +378,11 @@ void crossing(int c) {
 		}*/
 		//printf("\n");
 	}
-	vector<int*>().swap(newPopulation);
+	//vector<int*>().swap(newPopulation);
 }
+
+
+
 
 
 void clear() {
@@ -362,9 +403,13 @@ int main()
 	n = 209;
 	srand(time(0));
 	initialize("9200-40.txt");
-	createPopulation();
-	goalFunction(209);
-	crossing(populationSize);
+	createPopulation(s);
+	while (true) {
+		goalFunction(n);
+		crossing(c);
+		int id = findTheBestIndividual();
+		printf("Najlepszy osobnik o id: %d, o wartości funkcji celu: %d\n", id, goalFunctionValues[id]);
+	}	
 	clear();
 	system("pause");
     return 0;
