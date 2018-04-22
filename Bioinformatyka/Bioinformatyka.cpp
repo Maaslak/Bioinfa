@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const int l = 10, s = 80, c = 209, u = 5, d = 0;
+const int l = 10, s = 0, c = 209, u = 0, d = 0;
 vector<char*> oligonucleotydes;
 int** costMatrix = NULL;
 int** population = NULL;
@@ -57,10 +57,10 @@ void printVec(vector<char*> vec) {
 // Calculates len of connection of two specific oligonucleotydes
 int calcLen(char* a, char* b) {
 	int len = l;
-	for (int i = 0; i < l-1; i++)
+	for (int i = 0; i < l - 1; i++)
 	{
 		bool fit = true;
-		for (int j = 0; j < l-1-i; j++)
+		for (int j = 0; j < l - 1 - i; j++)
 		{
 			if (a[i + j + 1] != b[j]) {
 				fit = false;
@@ -90,13 +90,13 @@ void initialize(char* problemPath) {
 	
 }
 
-void createPopulation(int s) {
-	population = new int*[s];
-	populationSize = s;
-	for (int i = 0; i < s; i++)
-		population[i] = new int[s];
-	for (int i = 0; i < s; i++) {
-		for (int j = 0; j < s; j++) {
+void createPopulation(int div = 2) {
+	population = new int*[oligonucleotydes.size()/ div];
+	populationSize = oligonucleotydes.size() / div;
+	for (int i = 0; i < oligonucleotydes.size()/ div; i++)
+		population[i] = new int[oligonucleotydes.size()];
+	for (int i = 0; i < oligonucleotydes.size()/ div; i++) {
+		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			population[i][j] = j;			
 		}
 		random_shuffle(&population[i][0], &population[i][oligonucleotydes.size()]);
@@ -120,6 +120,20 @@ void goalFunction(int n) {
 		}
 		goalFunctionValues[i] = int(1.5*sum1) + sum2;
 	}
+}
+
+int returnGoalFunction(int n, int id) {
+	int sum1 = 0, sum2 = 0, len = 0;
+	for (int j = 0; j < oligonucleotydes.size() - 1; j++) {
+		if (len <= n) {
+			sum1 += costMatrix[population[id][j]][population[id][j + 1]];
+			len += costMatrix[population[id][j]][population[id][j + 1]];
+		}
+		else {
+			sum2 += costMatrix[population[id][j]][population[id][j + 1]];
+		}
+	}
+	return int(1.5*sum1) + sum2;
 }
 
 
@@ -186,16 +200,15 @@ int findTheWorstIndividual() {
 	return id;
 }
 
-
 //tylko na rodzicach, do poprawy
 void mutation(int u) {
-	for (int i = 1; i < s; i++) {
+	for (int i = 0; i < s; i++) {
 		int rnd = rand() % 100;
-		if (rnd < 5) {
+		if (rnd < u) {
 			int max = INT_MIN, id = -1;
 			for (int j = 0; j < oligonucleotydes.size() - 1; j++) {
-				if (calcLen(oligonucleotydes[population[i][j]], oligonucleotydes[population[i][j + 1]]) > max) {
-					max = calcLen(oligonucleotydes[population[i][j]], oligonucleotydes[population[i][j + 1]]);
+				if (costMatrix[population[i][j]][population[i][j + 1]] > max) {
+					max = costMatrix[population[i][j]][population[i][j + 1]];
 					id = j;
 				}
 			}
@@ -208,22 +221,26 @@ void mutation(int u) {
 			}
 
 			if (id == 0) {
-				tmp2++;
-			}
-			else {
 				tmp2 = oligonucleotydes.size() - 1;
 			}
-			if (calcLen(oligonucleotydes[population[i][id]], oligonucleotydes[population[i][tmp1]]) - calcLen(oligonucleotydes[population[i][tmp1]], oligonucleotydes[population[i][id]]) > calcLen(oligonucleotydes[population[i][tmp2]], oligonucleotydes[population[i][id]]) - calcLen(oligonucleotydes[population[i][id]], oligonucleotydes[population[i][tmp2]])) {
-				swap(oligonucleotydes[population[i][id]], oligonucleotydes[population[i][tmp1]]);
-			}
 			else {
-				swap(oligonucleotydes[population[i][id]], oligonucleotydes[population[i][tmp2]]);
+				tmp2--;
+			}
+			swap(population[i][id], population[i][tmp1]);
+			int val1 = returnGoalFunction(n, i);
+			swap(population[i][id], population[i][tmp1]);
+			swap(population[i][id], population[i][tmp2]);
+			int val2 = returnGoalFunction(n, i);
+			if (val1 < val2) {
+				swap(population[i][id], population[i][tmp2]);
+				swap(population[i][id], population[i][tmp1]);
 			}
 		}
 	}
+	goalFunction(n);
 }
 
-//Start crossing 
+//Start crossing
 void crossing(int c) {
 	vector<int*> newPopulation;
 
@@ -253,13 +270,13 @@ void crossing(int c) {
 			individual2[j] = population[finalLot[i+1]][j];
 		}
 
-		int tmp = endRand + 1;
+		int tmp = endRand;
 		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {	
 			tmp++;
 			if (tmp >= oligonucleotydes.size())
 				tmp = 0;
 			int *end = individual1 + oligonucleotydes.size();
-			int *result = find(individual1, end, population[i + 1][tmp]);
+			int *result = find(individual1, end, population[finalLot[i + 1]][tmp]);
 			if (result == end) {
 				individual1[j] = population[finalLot[i + 1]][tmp];
 				if (individual1[j] >= oligonucleotydes.size() || individual1[j] < 0)
@@ -270,13 +287,13 @@ void crossing(int c) {
 			}
 		}
 
-		tmp = endRand + 1;
+		tmp = endRand;
 		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {
 			tmp++;
 			if (tmp >= oligonucleotydes.size())
 				tmp = 0;
 			int *end = individual2 + oligonucleotydes.size();
-			int *result = find(individual2, end, population[i][tmp]);
+			int *result = find(individual2, end, population[finalLot[i]][tmp]);
 			if (result == end) {
 				individual2[j] = population[finalLot[i]][tmp];
 				if (individual2[j] >= oligonucleotydes.size() || individual2[j] < 0)
@@ -287,14 +304,14 @@ void crossing(int c) {
 			}
 		}
 
-		tmp = 0;
+		tmp = -1;
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			tmp++;
 			if (tmp >= oligonucleotydes.size())
 				tmp = 0;
 			if (individual2[j] == -1) {
 				int *end = individual2 + oligonucleotydes.size();
-				int *result = find(individual2, end, population[i][tmp]);
+				int *result = find(individual2, end, population[finalLot[i]][tmp]);
 				if (result == end) {
 					individual2[j] = population[finalLot[i]][tmp];
 					if (individual2[j] >= oligonucleotydes.size() || individual2[j] < 0)
@@ -303,20 +320,19 @@ void crossing(int c) {
 				else {
 					j--;
 				}
-				tmp++;
 			}
 			else
 				break;
 		}
 
-		tmp = 0;
+		tmp = -1;
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			tmp++;
 			if (tmp >= oligonucleotydes.size())
 				tmp = 0;
 			if (individual1[j] == -1) {
 				int *end = individual1 + oligonucleotydes.size();
-				int *result = find(individual1, end, population[i + 1][tmp]);
+				int *result = find(individual1, end, population[finalLot[i + 1]][tmp]);
 				if (result == end) {
 					individual1[j] = population[finalLot[i + 1]][tmp];
 					if (individual1[j] >= oligonucleotydes.size() || individual1[j] < 0)
@@ -325,7 +341,6 @@ void crossing(int c) {
 				else {
 					j--;
 				}
-				tmp++;
 			}
 			else
 				break;
@@ -335,17 +350,14 @@ void crossing(int c) {
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			printf("%d: %d ", j,individual1[j]);
 		}
-
 		printf("\nIndividual2: \n");
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			printf("%d: %d ",j, individual2[j]);
 		}
-
 		printf("\nParrent1 : \n");
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			printf("%d: %d ", j,population[finalLot[i]][j]);
 		}
-
 		printf("\nParrent2 : \n");
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			printf("%d: %d ",j, population[finalLot[i + 1]][j]);
@@ -360,7 +372,8 @@ void crossing(int c) {
 	int iter = 0;
 	int id = findTheBestIndividual();
 	swap(population[0], population[id]);
-	//mutation(u);
+
+	mutation(u);
 
 	while (newPopulation.size() < populationSize) {
 		newPopulation.push_back(population[iter]);
@@ -370,21 +383,18 @@ void crossing(int c) {
 	for (int i = 0; i < populationSize; i++) {
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			population[i][j] = newPopulation[i][j];
-			printf("%d ", population[i][j]);
+			//printf("%d ", population[i][j]);
 			
 		}
-		int *end = population[i] + oligonucleotydes.size();
+		/*int *end = population[i] + oligonucleotydes.size();
 		int *result = find(population[i], end, 0);
 		if (result == end) {
 			printf("\nNie ma zera w %d!!!", i);
 		}
-		printf("\n");
+		printf("\n");*/
 	}
 	vector<int*>().swap(newPopulation);
 }
-
-
-
 
 
 void clear() {
@@ -400,18 +410,39 @@ void clear() {
 	clearVec(oligonucleotydes);
 }
 
+int countOlinucleotydes(int id) {
+	int count = 0, len =0;
+	for (int i = 0; i < oligonucleotydes.size() - 1; i++) {
+		len += costMatrix[population[id][i]][population[id][i + 1]];
+		if (len > n)
+			break;
+		count++;
+	}
+	return count;
+}
+
 int main()
 {
 	n = 209;
 	srand(time(0));
 	initialize("9200-40.txt");
-	createPopulation(s);
+	createPopulation();
 	while (true) {
-		goalFunction(n);
-		crossing(c);
+		crossing(populationSize);
 		int id = findTheBestIndividual();
-		printf("Najlepszy osobnik o id: %d, o wartości funkcji celu: %d\n", id, goalFunctionValues[id]);
-	}	
+		printf("Najelpszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d\n", goalFunctionValues[id], countOlinucleotydes(id), n);
+	}
+	
+
+	for (int i = 0; i < oligonucleotydes.size(); i++) {
+		for (int j = 0; j < oligonucleotydes.size(); j++) {			
+			printf("%d ", costMatrix[i][j]);
+		}
+		printf("\n");
+	}
+
+	//printf("%d", calcLen(oligonucleotydes[0], oligonucleotydes[0]));
+	
 	clear();
 	system("pause");
     return 0;
