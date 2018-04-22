@@ -223,7 +223,7 @@ void mutation(int u) {
 	}
 }
 
-//Start crossing (do dokończenia)
+//Start crossing 
 void crossing(int c) {
 	vector<int*> newPopulation;
 
@@ -358,7 +358,7 @@ void crossing(int c) {
 	int iter = 0;
 	int id = findTheBestIndividual();
 	swap(population[0], population[id]);
-	mutation(u);
+	//mutation(u);
 
 	while (newPopulation.size() < populationSize) {
 		newPopulation.push_back(population[iter]);
@@ -378,7 +378,7 @@ void crossing(int c) {
 		}*/
 		//printf("\n");
 	}
-	//vector<int*>().swap(newPopulation);
+	vector<int*>().swap(newPopulation);
 }
 
 
