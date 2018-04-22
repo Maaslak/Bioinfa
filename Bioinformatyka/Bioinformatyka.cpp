@@ -253,13 +253,13 @@ void crossing(int c) {
 			individual2[j] = population[finalLot[i+1]][j];
 		}
 
-		int tmp = endRand;
+		int tmp = endRand + 1;
 		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {	
 			tmp++;
 			if (tmp >= oligonucleotydes.size())
 				tmp = 0;
 			int *end = individual1 + oligonucleotydes.size();
-			int *result = find(individual1, end, population[finalLot[i + 1]][tmp]);
+			int *result = find(individual1, end, population[i + 1][tmp]);
 			if (result == end) {
 				individual1[j] = population[finalLot[i + 1]][tmp];
 				if (individual1[j] >= oligonucleotydes.size() || individual1[j] < 0)
@@ -270,13 +270,13 @@ void crossing(int c) {
 			}
 		}
 
-		tmp = endRand;
+		tmp = endRand + 1;
 		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {
 			tmp++;
 			if (tmp >= oligonucleotydes.size())
 				tmp = 0;
 			int *end = individual2 + oligonucleotydes.size();
-			int *result = find(individual2, end, population[finalLot[i]][tmp]);
+			int *result = find(individual2, end, population[i][tmp]);
 			if (result == end) {
 				individual2[j] = population[finalLot[i]][tmp];
 				if (individual2[j] >= oligonucleotydes.size() || individual2[j] < 0)
@@ -287,14 +287,14 @@ void crossing(int c) {
 			}
 		}
 
-		tmp = -1;
+		tmp = 0;
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			tmp++;
 			if (tmp >= oligonucleotydes.size())
 				tmp = 0;
 			if (individual2[j] == -1) {
 				int *end = individual2 + oligonucleotydes.size();
-				int *result = find(individual2, end, population[finalLot[i]][tmp]);
+				int *result = find(individual2, end, population[i][tmp]);
 				if (result == end) {
 					individual2[j] = population[finalLot[i]][tmp];
 					if (individual2[j] >= oligonucleotydes.size() || individual2[j] < 0)
@@ -303,19 +303,20 @@ void crossing(int c) {
 				else {
 					j--;
 				}
+				tmp++;
 			}
 			else
 				break;
 		}
 
-		tmp = -1;
+		tmp = 0;
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			tmp++;
 			if (tmp >= oligonucleotydes.size())
 				tmp = 0;
 			if (individual1[j] == -1) {
 				int *end = individual1 + oligonucleotydes.size();
-				int *result = find(individual1, end, population[finalLot[i + 1]][tmp]);
+				int *result = find(individual1, end, population[i + 1][tmp]);
 				if (result == end) {
 					individual1[j] = population[finalLot[i + 1]][tmp];
 					if (individual1[j] >= oligonucleotydes.size() || individual1[j] < 0)
@@ -324,6 +325,7 @@ void crossing(int c) {
 				else {
 					j--;
 				}
+				tmp++;
 			}
 			else
 				break;
@@ -368,15 +370,15 @@ void crossing(int c) {
 	for (int i = 0; i < populationSize; i++) {
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			population[i][j] = newPopulation[i][j];
-			//printf("%d ", population[i][j]);
+			printf("%d ", population[i][j]);
 			
 		}
-		/*int *end = population[i] + oligonucleotydes.size();
+		int *end = population[i] + oligonucleotydes.size();
 		int *result = find(population[i], end, 0);
 		if (result == end) {
 			printf("\nNie ma zera w %d!!!", i);
-		}*/
-		//printf("\n");
+		}
+		printf("\n");
 	}
 	vector<int*>().swap(newPopulation);
 }
