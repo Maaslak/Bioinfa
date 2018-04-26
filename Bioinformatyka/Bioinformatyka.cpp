@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const int l = 10, s = 10, c = 209, u = 5, d = 0;
+const int l = 10, s = 10, c = 209, u = 0, d = 0;
 vector<char*> oligonucleotydes;
 vector<int*> population;
 int** costMatrix = NULL;
@@ -114,6 +114,8 @@ void goalFunction(int n) {
 		{
 			totalSum += costMatrix[population[i][start]][population[i][(start+1)%oligonucleotydes.size()]];
 			int prev = end - 1;
+			if (prev < 0)
+				prev += oligonucleotydes.size();
 			while (len + costMatrix[population[i][prev]][population[i][end]] + 1 <= n )
 			{
 				prev = end - 1;
@@ -127,11 +129,13 @@ void goalFunction(int n) {
 				maxSum = sum1;
 				numberOfOligonucleotydes[i] = (end - start + oligonucleotydes.size()) % oligonucleotydes.size();
 			}
+			if (sum1 < 0)
+				throw new exception();
 			sum1 -= costMatrix[population[i][start]][population[i][(start+1)%oligonucleotydes.size()]];
-			len -= costMatrix[population[i][start]][population[i][(start + 1) % oligonucleotydes.size()]] - 1;
+			len -= costMatrix[population[i][start]][population[i][(start + 1) % oligonucleotydes.size()]] + 1;
 		}
 
-		int goal = (int)(sum1 * 0.5) + totalSum;
+		int goal = (int)(0.5 * sum1) + totalSum;
 		goalFunctionValues[i] = goal;
 		int * individual = new int[oligonucleotydes.size()];
 		for (int j = 0; j < oligonucleotydes.size(); j++)
