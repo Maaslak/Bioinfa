@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const int l = 10, s = 10, c = 209, u = 0, d = 0;
+const int l = 10, s = 10, c = 209, u = 5, d = 0;
 vector<char*> oligonucleotydes;
 vector<int*> population;
 int** costMatrix = NULL;
