@@ -17,7 +17,7 @@ vector<char*> oligonucleotydes;
 vector<int*> population;
 int** costMatrix = NULL;
 int* goalFunctionValues = NULL;
-int* startValues = NULL, *numberOfOligonucleotydes = NULL;
+int *numberOfOligonucleotydes = NULL;
 int n;
 
 void parseInput(char* filepath) {	
@@ -49,10 +49,6 @@ void clearVec2(vector<int*> vec) {
 	}
 }
 
-void printVec(vector<char*> vec) {
-	for (int i = 0; i < vec.size(); i++)
-		printf("%s\n", vec[i]);
-}
 
 // Calculates len of connection of two specific oligonucleotydes
 int calcLen(char* a, char* b) {
@@ -91,9 +87,9 @@ void initialize(char* problemPath) {
 }
 
 void createPopulation(int div = 2) {
-	for (int i = 0; i < oligonucleotydes.size()/ div; i++)
-		population.push_back(new int[oligonucleotydes.size()]);
+	
 	for (int i = 0; i < oligonucleotydes.size()/ div; i++) {
+		population.push_back(new int[oligonucleotydes.size()]);
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			population[i][j] = j;			
 		}
@@ -129,33 +125,23 @@ void goalFunction(int n) {
 			}
 			if (sum1 > maxSum) {
 				maxSum = sum1;
-				startValues[i] = start;
 				numberOfOligonucleotydes[i] = (end - start + oligonucleotydes.size()) % oligonucleotydes.size();
 			}
 			sum1 -= costMatrix[population[i][start]][population[i][(start+1)%oligonucleotydes.size()]];
 			len -= costMatrix[population[i][start]][population[i][(start + 1) % oligonucleotydes.size()]] - 1;
 		}
 
-		int goal = (int)(sum1 * 1.5) - sum1 + totalSum;
+		int goal = (int)(sum1 * 0.5) + totalSum;
 		goalFunctionValues[i] = goal;
-		
+		int * individual = new int[oligonucleotydes.size()];
+		for (int j = 0; j < oligonucleotydes.size(); j++)
+		{
+			individual[j] = population[i][(j+start)%oligonucleotydes.size()];
+		}
+		delete(population[i]);
+		population[i] = individual;
 	}
 }
-
-int returnGoalFunction(int n, int id) {
-	int sum1 = 0, sum2 = 0, len = 0;
-	for (int j = 0; j < oligonucleotydes.size() - 1; j++) {
-		if (len <= n) {
-			sum1 += costMatrix[population[id][j]][population[id][j + 1]];
-			len += costMatrix[population[id][j]][population[id][j + 1]];
-		}
-		else {
-			sum2 += costMatrix[population[id][j]][population[id][j + 1]];
-		}
-	}
-	return int(1.5*sum1) + sum2;
-}
-
 
 
 //Choose individuals to parental population (tested, working)
@@ -210,16 +196,6 @@ int findTheBestIndividual() {
 	return id;
 }
 
-int findTheWorstIndividual() {
-	int max = INT_MIN, id = -1;;
-	for (int i = 0; i < population.size(); i++) {
-		if (goalFunctionValues[i] > max) {
-			max = goalFunctionValues[i];
-			id = i;
-		}
-	}
-	return id;
-}
 
 //tylko na rodzicach, do poprawy
 void mutation(int u) {
@@ -443,20 +419,8 @@ void clear() {
 	}
 	delete(costMatrix);
 	delete(goalFunctionValues);
-	delete(startValues);
 	delete(numberOfOligonucleotydes);
 	clearVec(oligonucleotydes);
-}
-
-int countOlinucleotydes(int id) {
-	int count = 0, len =0;
-	for (int i = 0; i < oligonucleotydes.size() - 1; i++) {
-		len += costMatrix[population[id][i]][population[id][i + 1]];
-		if (len > n)
-			break;
-		count++;
-	}
-	return count;
 }
 
 int main()
@@ -467,7 +431,6 @@ int main()
 	createPopulation();
 	goalFunctionValues = new int[population.size()];
 	numberOfOligonucleotydes = new int[population.size()];
-	startValues = new int[population.size()];
 	goalFunction(n);
 	while (true) {
 		crossing(population.size());
