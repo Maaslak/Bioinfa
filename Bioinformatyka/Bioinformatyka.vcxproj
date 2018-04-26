@@ -23,7 +23,7 @@
     <ProjectGuid>{16057BB6-1311-43CF-9D75-75ECF14E6FDB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Bioinformatyka</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
