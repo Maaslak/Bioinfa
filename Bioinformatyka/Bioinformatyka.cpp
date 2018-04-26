@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const int l = 10, s = 10, c = 209, u = 45, d = 0;
+const int l = 10, s = 10, c = 209, u = 5, d = 0;
 vector<char*> oligonucleotydes;
 vector<int*> population;
 int** costMatrix = NULL;
@@ -236,12 +236,43 @@ void mutation(int u) {
 		int rnd = rand() % 100;
 		if (rnd < u) {
 			int max = INT_MIN, id = -1;
-			for (int j = 0; j < oligonucleotydes.size() - 1; j++) {
+			max = costMatrix[population[i][oligonucleotydes.size()-1]][population[i][0]] + costMatrix[population[i][0]][population[i][1]];
+			id = 0;
+			for (int j = 1; j < oligonucleotydes.size() - 1; j++) {
 				if (costMatrix[population[i][j]][population[i][j + 1]] > max) {
-					max = costMatrix[population[i][j]][population[i][j + 1]];
+					max = costMatrix[population[i][j - 1]][population[i][j]] + costMatrix[population[i][j]][population[i][j + 1]];
 					id = j;
 				}
 			}
+
+			int id11 = 0, id21 = 0, id12 = 0, id22 = 0, sum1 = 0, sum2 = 0;
+			if (id - 1 < 0)
+				id11 = id - 1 + oligonucleotydes.size();
+			else
+				id11 = id - 1;
+			if (id - 2 < 0)
+				id21 = id - 2 + oligonucleotydes.size();
+			else
+				id21 = id - 2;
+
+			sum1 = costMatrix[population[i][id21]][population[i][id]] + costMatrix[population[i][id]][population[i][id11]];
+
+			if (id + 1 >= oligonucleotydes.size())
+				id12 = id + 1 - oligonucleotydes.size();
+			else
+				id12 = id + 1;
+			if (id + 2 >= oligonucleotydes.size())
+				id22 = id + 2 - oligonucleotydes.size();
+			else
+				id22 = id + 2;
+
+			sum2 = costMatrix[population[i][id12]][population[i][id]] + costMatrix[population[i][id]][population[i][id22]];
+
+			if (sum1 > sum2)
+				swap(population[i][id], population[i][id11]);
+			else
+				swap(population[i][id], population[i][id12]);
+			
 			/*
 			int minCost = INT_MAX;
 			for (int k = 0; k < n - 1; k++) {
