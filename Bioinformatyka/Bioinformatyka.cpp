@@ -114,7 +114,12 @@ void goalFunction(int n) {
 			sum1[j] = 0;
 			sum2[j] = 0;
 		}
-		int end;
+		int end = 0;
+		for (int start = 0; start < oligonucleotydes.size(); start++)
+		{
+			
+		}
+		/*
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			int cost = costMatrix[population[i][j]][population[i][(j + 1) % oligonucleotydes.size()]];
 			if (len[0] + cost + 1 <= n) {
@@ -124,7 +129,6 @@ void goalFunction(int n) {
 			}
 			else {
 				sum2[0] += cost;
-				printf("")
 			}
 		}
 		
@@ -135,7 +139,7 @@ void goalFunction(int n) {
 			sum2[j] = sum2[j - 1] + costMatrix[population[i][j - 1]][population[i][j]];
 			int newEnd = j;
 			bool after = false;
-			while (nextLen <= n)
+			while (nextLen + costMatrix[population[i][(end) % oligonucleotydes.size()]][population[i][(end + j + 1) % oligonucleotydes.size()]] + 1 <= n)
 			{
 				sum1[j] += costMatrix[population[i][(end) % oligonucleotydes.size()]][population[i][(end + j + 1) % oligonucleotydes.size()]];
 				sum2[j] -= costMatrix[population[i][(end) % oligonucleotydes.size()]][population[i][(end + j + 1) % oligonucleotydes.size()]];
@@ -151,7 +155,6 @@ void goalFunction(int n) {
 				if (end == newEnd)
 					after = true;
 				if (sum2[j] < 0) {
-					printf("%d", sum2[j]);
 					throw new exception();
 				}
 			}
@@ -171,7 +174,7 @@ void goalFunction(int n) {
 		if (tempGoal < 0)
 			throw new exception();
 		lenValues[i] = len[id];
-		
+		*/
 		delete(len);
 		delete(sum1);
 		delete(sum2);
