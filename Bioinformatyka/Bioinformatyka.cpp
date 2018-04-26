@@ -9,6 +9,8 @@
 #include <time.h>
 #include <algorithm>
 #include <stdlib.h>
+#include <list>
+#include <map>
 
 using namespace std;
 
@@ -266,105 +268,128 @@ void crossing(int c) {
 	vector<int*> newPopulation;
 
 	int* finalLot = chooseIndividuals(c);
-	int* individual1;
-	int* individual2;
+	
+	list<int> individual1;
+	list<int> individual2;
+	list<int>::iterator it1 = individual1.begin();
+	list<int>::iterator it2 = individual2.begin();
+	map<int, int> individualMap1;
+	map<int, int> individualMap2;
 
 	
 
 	for (int i = 0; i < c / 3 - 1 ; i++) {
-		individual1 = new int[oligonucleotydes.size()];
-		individual2 = new int[oligonucleotydes.size()];
-		for (int j = 0; j < oligonucleotydes.size(); j++) {
-			individual1[j] = -1;
-			individual2[j] = -1;
+		individual1.clear();
+		individual2.clear();
+		individualMap1.clear();
+		individualMap2.clear();
+		for (int i = 0; i < oligonucleotydes.size(); i++) {
+			individualMap1.insert(pair<int,int>(i, i));
+			individualMap2.insert(pair<int,int>(i, i));
 		}
 
-		int startRand = rand() % (oligonucleotydes.size() - 1);
-		int endRand = rand() % (oligonucleotydes.size() - 1);
+		int startRand = rand() % (oligonucleotydes.size() - 2) + 1;
+		int endRand = rand() % (oligonucleotydes.size() - 2) + 1;
 
 		if (endRand < startRand)
 			swap(endRand, startRand);
 
 		for (int j = startRand; j <= endRand; j++) {
-			individual1[j] = population[finalLot[i]][j];
-			individual2[j] = population[finalLot[i+1]][j];
+			individual1.push_back(population[finalLot[i]][j]);
+			individualMap1.erase(population[finalLot[i]][j]);
+			individual2.push_back(population[finalLot[i+1]][j]);
+			individualMap2.erase(population[finalLot[i + 1]][j]);
 		}
 
-		int tmp = endRand;
+
 		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {	
-			tmp++;
-			if (tmp >= oligonucleotydes.size())
-				tmp = 0;
-			int *end = individual1 + oligonucleotydes.size();
-			int *result = find(individual1, end, population[finalLot[i + 1]][tmp]);
-			if (result == end) {
-				individual1[j] = population[finalLot[i + 1]][tmp];
-				if (individual1[j] >= oligonucleotydes.size() || individual1[j] < 0)
-					printf("\nERROR:  petla1-- i+1: %d, j: %d, value: %d, tmp: %d", i+1, j, individual1[j], tmp);
-			}
-			else {
-				j--;
+			if (find(individual1.begin(), individual1.end(), population[finalLot[i + 1]][j]) != individual1.end()) {
+				individual1.push_back(population[finalLot[i + 1]][j]);
+				individualMap1.erase(population[finalLot[i + 1]][j]);
 			}
 		}
 
-		tmp = endRand;
 		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {
-			tmp++;
-			if (tmp >= oligonucleotydes.size())
-				tmp = 0;
-			int *end = individual2 + oligonucleotydes.size();
-			int *result = find(individual2, end, population[finalLot[i]][tmp]);
-			if (result == end) {
-				individual2[j] = population[finalLot[i]][tmp];
-				if (individual2[j] >= oligonucleotydes.size() || individual2[j] < 0)
-					printf("\nERROR:  petla2-- i: %d, j: %d, value: %d, tmp: %d", i, j, individual2[j], tmp);
-			}
-			else {
-				j--;
+			if (find(individual2.begin(), individual2.end(), population[finalLot[i]][j]) != individual2.end()) {
+				individual2.push_back(population[finalLot[i]][j]);
+				individualMap2.erase(population[finalLot[i]][j]);
 			}
 		}
 
-		tmp = -1;
-		for (int j = 0; j < oligonucleotydes.size(); j++) {
-			tmp++;
-			if (tmp >= oligonucleotydes.size())
-				tmp = 0;
-			if (individual2[j] == -1) {
-				int *end = individual2 + oligonucleotydes.size();
-				int *result = find(individual2, end, population[finalLot[i]][tmp]);
-				if (result == end) {
-					individual2[j] = population[finalLot[i]][tmp];
-					if (individual2[j] >= oligonucleotydes.size() || individual2[j] < 0)
-						printf("\nERROR:  petla3-- i: %d, j: %d, value: %d, tmp: %d", i, j, individual2[j], tmp);
-				}
-				else {
-					j--;
-				}
+		for (int j = startRand - 1; j >= 0; j--) {
+			if (find(individual2.begin(), individual2.end(), population[finalLot[i]][j]) != individual2.end()) {
+				individual2.push_front(population[finalLot[i]][j]);
+				individualMap2.erase(population[finalLot[i]][j]);
 			}
-			else
-				break;
 		}
 
-		tmp = -1;
-		for (int j = 0; j < oligonucleotydes.size(); j++) {
-			tmp++;
-			if (tmp >= oligonucleotydes.size())
-				tmp = 0;
-			if (individual1[j] == -1) {
-				int *end = individual1 + oligonucleotydes.size();
-				int *result = find(individual1, end, population[finalLot[i + 1]][tmp]);
-				if (result == end) {
-					individual1[j] = population[finalLot[i + 1]][tmp];
-					if (individual1[j] >= oligonucleotydes.size() || individual1[j] < 0)
-						printf("\nERROR:  petla4-- i+1: %d, j: %d, value: %d, tmp: %d", i + 1, j, individual1[j], tmp);
-				}
-				else {
-					j--;
-				}
+		for (int j = startRand - 1; j >= 0; j--) {
+			if (find(individual1.begin(), individual1.end(), population[finalLot[i + 1]][j]) != individual1.end()) {
+				individual1.push_front(population[finalLot[i + 1]][j]);
+				individualMap1.erase(population[finalLot[i + 1]][j]);
 			}
-			else
-				break;
 		}
+
+		for (map<int, int>::iterator it = individualMap1.begin(); it != individualMap1.end(); ++it) {
+			int value = it->second;
+			int min = INT_MAX, id = - 1;
+			list<int>::iterator itt = individual1.begin();
+			min = costMatrix[individual1.back()][value] + costMatrix[value][individual1.front()];
+			id = 0;
+			++itt;
+			int i = 1;
+			for (itt; itt != individual1.end(); ++itt) {	
+				++itt;
+				if (itt == individual1.end())
+					break;
+				--itt;
+				int sum = costMatrix[value][*(itt)];
+				--itt;
+				sum += costMatrix[*(itt)][value];
+				++itt;
+				if (sum < min) {
+					min = sum;
+					id = i;
+				}
+				i++;
+			}
+			itt = individual1.begin();
+			for (int i = 0; i < id; i++)
+				++itt;
+			individual1.insert(itt, value);
+		}
+
+
+		for (map<int, int>::iterator it = individualMap2.begin(); it != individualMap2.end(); ++it) {
+			int value = it->second;
+			int min = INT_MAX, id = -1;
+			list<int>::iterator itt = individual2.begin();
+			min = costMatrix[individual2.back()][value] + costMatrix[value][individual2.front()];
+			id = 0;
+			++itt;
+			int i = 1;
+			for (itt; itt != individual2.end(); ++itt) {
+				++itt;
+				if (itt == individual2.end())
+					break;
+				--itt;
+				int sum = costMatrix[value][*itt];
+				--itt;
+				sum += costMatrix[*itt][value];
+				++itt;
+				if (sum < min) {
+					min = sum;
+					id = i;
+				}
+				i++;
+			}
+			itt = individual2.begin();
+			for (int i = 0; i < id; i++)
+				++itt;
+			individual2.insert(itt, value);
+		}
+			
+
 
 		/*printf("Individual1: \n");
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
@@ -385,8 +410,27 @@ void crossing(int c) {
 		printf("\nstartRand : %d ", startRand);
 		printf("   endRand : %d\n", endRand);*/
 
-		newPopulation.push_back(individual1);
-		newPopulation.push_back(individual2);
+		int* tmp;
+		tmp = new int[individual1.size()];
+		int ii = 0;
+		for (list<int>::const_iterator iterator = individual1.begin(), end = individual1.end(); iterator != end; ++iterator) {
+			tmp[ii] = *iterator;
+			ii++;
+		}
+		/*for (int z = 0; z < individual1.size(); z++) {
+			printf("%d ", tmp[z]);
+		}
+		printf("\n");*/
+		newPopulation.push_back(tmp);
+		//delete(tmp);
+		tmp = new int[individual2.size()];
+		ii = 0;
+		for (list<int>::const_iterator iterator = individual2.begin(), end = individual2.end(); iterator != end; ++iterator) {
+			tmp[ii] = *iterator;
+			ii++;
+		}
+		newPopulation.push_back(tmp);
+		//delete(tmp);
 	}
 
 	int iter = 0;
@@ -442,6 +486,7 @@ int main()
 		goalFunction(n);
 		int id = findTheBestIndividual();
 		printf("Najelpszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d\n", goalFunctionValues[id], numberOfOligonucleotydes[id], n);
+
 	}
 	
 
