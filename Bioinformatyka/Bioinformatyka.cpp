@@ -105,7 +105,7 @@ void goalFunction(int n) {
 	if(goalFunctionValues == NULL)
 		goalFunctionValues = new int[population.size()];
 	for (int i = 0; i < population.size(); i++) {
-		/*
+		
 		int* sum1 ,* sum2,* cyclicCosts,* len;
 		cyclicCosts = new int [oligonucleotydes.size()];
 		len = new int[oligonucleotydes.size()];
@@ -117,16 +117,16 @@ void goalFunction(int n) {
 			sum1[j] = 0;
 			sum2[j] = 0;
 		}
-		*/
-		int tempSum1 = 0, tempSum2 = 0;
+		
+		//int tempSum1 = 0, tempSum2 = 0;
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
-			int templen = l;
-			if (templen <= n) {
-				tempSum1 += costMatrix[population[i][j]][population[i][j + 1]];
-				templen += costMatrix[population[i][j]][population[i][j + 1]] + 1;
+			len[0] = l;
+			if (len[0] <= n) {
+				sum1[0] += costMatrix[population[i][j]][population[i][(j + 1)%oligonucleotydes.size()]];
+				len[0] += costMatrix[population[i][j]][population[i][(j + 1) % oligonucleotydes.size()]] + 1;
 			}
 			else {
-				tempSum2 += costMatrix[population[i][j]][population[i][j + 1]];
+				sum2[0] += costMatrix[population[i][j]][population[i][(j + 1) % oligonucleotydes.size()]];
 			}
 		}
 		/*
@@ -141,7 +141,7 @@ void goalFunction(int n) {
 		}
 		*/
 
-		goalFunctionValues[i] = int(1.5*tempSum1) + tempSum2;
+		goalFunctionValues[i] = int(1.5*sum1[0]) + sum2[0];
 		/*
 		delete(len);
 		delete(cyclicCosts);
