@@ -17,6 +17,7 @@ vector<char*> oligonucleotydes;
 vector<int*> population;
 int** costMatrix = NULL;
 int* goalFunctionValues = NULL;
+int* lenValues = NULL;
 int n;
 
 void parseInput(char* filepath) {	
@@ -102,52 +103,79 @@ void createPopulation(int div = 2) {
 
 //create table with values of Goal function answering positions of individuals in population (tested, working)
 void goalFunction(int n) {
-	if(goalFunctionValues == NULL)
-		goalFunctionValues = new int[population.size()];
 	for (int i = 0; i < population.size(); i++) {
 		
-		int* sum1 ,* sum2,* cyclicCosts,* len;
-		cyclicCosts = new int [oligonucleotydes.size()];
+		int* sum1 ,* sum2,* len;
 		len = new int[oligonucleotydes.size()];
 		sum1 = new int[oligonucleotydes.size()];
 		sum2 = new int[oligonucleotydes.size()];
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
-			cyclicCosts[j] = 0;
 			len[j] = l;
 			sum1[j] = 0;
 			sum2[j] = 0;
 		}
-		
-		//int tempSum1 = 0, tempSum2 = 0;
+		int end;
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
-			len[0] = l;
-			if (len[0] <= n) {
-				sum1[0] += costMatrix[population[i][j]][population[i][(j + 1)%oligonucleotydes.size()]];
-				len[0] += costMatrix[population[i][j]][population[i][(j + 1) % oligonucleotydes.size()]] + 1;
+			int cost = costMatrix[population[i][j]][population[i][(j + 1) % oligonucleotydes.size()]];
+			if (len[0] + cost + 1 <= n) {
+				sum1[0] += cost;
+				len[0] +=  cost + 1;
+				end = j;
 			}
 			else {
-				sum2[0] += costMatrix[population[i][j]][population[i][(j + 1) % oligonucleotydes.size()]];
+				sum2[0] += cost;
+				printf("")
 			}
 		}
-		/*
-		for (int k = 0; k < oligonucleotydes.size(); k++) {
-			if (len <= n) {
-				sum1 += costMatrix[population[i][j]][population[i][j + 1]];
-				len += costMatrix[population[i][j]][population[i][j + 1]];
+		
+		for (int j = 1; j < oligonucleotydes.size(); j++) {
+			int nextLen = len[j - 1];
+			nextLen -= (1 + costMatrix[population[i][j - 1]][population[i][j]]);
+			sum1[j] = sum1[j - 1] - costMatrix[population[i][j - 1]][population[i][j]];
+			sum2[j] = sum2[j - 1] + costMatrix[population[i][j - 1]][population[i][j]];
+			int newEnd = j;
+			bool after = false;
+			while (nextLen <= n)
+			{
+				sum1[j] += costMatrix[population[i][(end) % oligonucleotydes.size()]][population[i][(end + j + 1) % oligonucleotydes.size()]];
+				sum2[j] -= costMatrix[population[i][(end) % oligonucleotydes.size()]][population[i][(end + j + 1) % oligonucleotydes.size()]];
+				nextLen += costMatrix[population[i][(end) % oligonucleotydes.size()]][population[i][(end + j + 1) % oligonucleotydes.size()]] + 1;
+				newEnd= (newEnd + 1) % oligonucleotydes.size();
+				if (after) {
+					int prev = newEnd - 1;
+					if (prev < 0)
+						prev += oligonucleotydes.size();
+					sum2[j] -= costMatrix[population[i][prev]][population[i][newEnd]];
+					sum1[j] += costMatrix[population[i][prev]][population[i][newEnd]];
+				}
+				if (end == newEnd)
+					after = true;
+				if (sum2[j] < 0) {
+					printf("%d", sum2[j]);
+					throw new exception();
+				}
 			}
-			else {
-				sum2 += costMatrix[population[i][j]][population[i][j + 1]];
+			end = newEnd;
+		}
+		int tempGoal = INT_MAX;
+		int id;
+		for (int j = 0; j < oligonucleotydes.size(); j++) {
+			int g = int(1.5*sum1[j]) + sum2[j];
+			if (g < tempGoal) {
+				tempGoal = g;
+				id = j;
 			}
 		}
-		*/
 
-		goalFunctionValues[i] = int(1.5*sum1[0]) + sum2[0];
-		/*
+		goalFunctionValues[i] = tempGoal;
+		if (tempGoal < 0)
+			throw new exception();
+		lenValues[i] = len[id];
+		
 		delete(len);
-		delete(cyclicCosts);
 		delete(sum1);
 		delete(sum2);
-		*/
+		
 	}
 }
 
@@ -294,7 +322,6 @@ void mutation(int u) {
 void crossing(int c) {
 	vector<int*> newPopulation;
 
-	goalFunction(n);
 	int* finalLot = chooseIndividuals(c);
 	int* individual1;
 	int* individual2;
@@ -453,6 +480,7 @@ void clear() {
 	}
 	delete(costMatrix);
 	delete(goalFunctionValues);
+	delete(lenValues);
 	clearVec(oligonucleotydes);
 }
 
@@ -473,6 +501,9 @@ int main()
 	srand(time(0));
 	initialize("9200-40.txt");
 	createPopulation();
+	goalFunctionValues = new int[population.size()];
+	lenValues = new int[population.size()];
+	goalFunction(n);
 	while (true) {
 		crossing(population.size());
 		mutation(u);
