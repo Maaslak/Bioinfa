@@ -14,7 +14,7 @@
 
 using namespace std;
 
-const int l = 10, s = 10, c = 209, u = 5, d = 0;
+const int l = 10, s = 10, c = 209, u = 20, d = 0;
 vector<char*> oligonucleotydes;
 vector<int*> population;
 int** costMatrix = NULL;
@@ -89,8 +89,28 @@ void initialize(char* problemPath) {
 }
 
 void createPopulation(int div = 2) {
-	
-	for (int i = 0; i < oligonucleotydes.size()/ div; i++) {
+	map<int, int> oliMap;
+	population.push_back(new int[oligonucleotydes.size()]);
+	population[0][0] = 0;
+	oliMap.insert(pair<int, int>(0, 0));
+	int sum = 10, wyn = 0;;
+	for (int j = 1; j < oligonucleotydes.size(); j++) {
+		int min = INT_MAX, id = -1;
+		for (int k = 0; k < oligonucleotydes.size(); k++) {
+			if (costMatrix[j - 1][k] < min && !oliMap.count(k)) {
+				min = costMatrix[j - 1][k];
+				id = k;
+			}
+		}
+		population[0][j] = id;
+		sum += costMatrix[j - 1][id] + 1;
+		if (sum <= 209)
+			wyn++;
+		oliMap.insert(pair<int, int>(id, id));
+	}
+	printf("oligonukleotydow: %d goalFunction: %d\n", wyn, sum);
+
+	for (int i = 1; i < oligonucleotydes.size()/ div; i++) {
 		population.push_back(new int[oligonucleotydes.size()]);
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			population[i][j] = j;			
@@ -218,7 +238,20 @@ void mutation(int u) {
 				}
 			}
 
-			int id11 = 0, id21 = 0, id12 = 0, id22 = 0, sum1 = 0, sum2 = 0;
+			int min = INT_MAX, id2 = -1;
+			for (int j = 0;j<oligonucleotydes.size(); j++) {
+				int sum = costMatrix[population[i][(j - 1 + oligonucleotydes.size())%oligonucleotydes.size()]][population[i][id]];
+				sum += costMatrix[population[i][id]][population[i][(j + 1)%oligonucleotydes.size()]];
+				sum += costMatrix[population[i][(id - 1 + oligonucleotydes.size()) % oligonucleotydes.size()]][population[i][j]];
+				sum += costMatrix[population[i][j]][population[i][(id + 1) % oligonucleotydes.size()]];
+				if (sum < min) {
+					min = sum;
+					id2 = j;
+				}
+			}
+			swap(population[i][id], population[i][id2]);
+
+			/*int id11 = 0, id21 = 0, id12 = 0, id22 = 0, sum1 = 0, sum2 = 0;
 			if (id - 1 < 0)
 				id11 = id - 1 + oligonucleotydes.size();
 			else
@@ -244,7 +277,7 @@ void mutation(int u) {
 			if (sum1 > sum2)
 				swap(population[i][id], population[i][id11]);
 			else
-				swap(population[i][id], population[i][id12]);
+				swap(population[i][id], population[i][id12]);*/
 			
 			/*
 			int minCost = INT_MAX;
@@ -480,6 +513,12 @@ int main()
 	goalFunctionValues = new int[population.size()];
 	numberOfOligonucleotydes = new int[population.size()];
 	goalFunction(n);
+	for (int i = 0; i < oligonucleotydes.size(); i++) {
+		printf("%d ", population[0][i]);
+	}
+	printf("\n");
+	int id = findTheBestIndividual();
+	printf("Najelpszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d\n", goalFunctionValues[id], numberOfOligonucleotydes[id], n);
 	while (true) {
 		crossing(population.size());
 		mutation(u);
