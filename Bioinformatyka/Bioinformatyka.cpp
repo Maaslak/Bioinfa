@@ -14,7 +14,7 @@
 
 using namespace std;
 
-const int l = 10, s = 10, c = 209, u = 30, d = 0;
+const int l = 10, s = 10, c = 209, u = 50, d = 0;
 vector<char*> oligonucleotydes;
 vector<int*> population;
 int** costMatrix = NULL;
@@ -93,23 +93,22 @@ void createPopulation(int div = 2) {
 	population.push_back(new int[oligonucleotydes.size()]);
 	population[0][0] = 0;
 	oliMap.insert(pair<int, int>(0, 0));
-	int sum = 10, wyn = 0;;
+	int sum = 10, wyn = 0;
 	for (int j = 1; j < oligonucleotydes.size(); j++) {
 		int min = INT_MAX, id = -1;
 		for (int k = 0; k < oligonucleotydes.size(); k++) {
-			if (costMatrix[j - 1][k] < min && !oliMap.count(k)) {
-				min = costMatrix[j - 1][k];
+			if ((costMatrix[population[0][j - 1]][k] < min) && !oliMap.count(k)) {
+				min = costMatrix[population[0][j - 1]][k];
 				id = k;
 			}
 		}
 		population[0][j] = id;
-		sum += costMatrix[j - 1][id] + 1;
+		sum += costMatrix[population[0][j - 1]][id] + 1;
 		if (sum <= 209)
 			wyn++;
 		oliMap.insert(pair<int, int>(id, id));
 	}
-	printf("oligonukleotydow: %d goalFunction: %d\n", wyn, sum);
-
+	
 	for (int i = 1; i < oligonucleotydes.size()/ div; i++) {
 		population.push_back(new int[oligonucleotydes.size()]);
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
@@ -130,8 +129,9 @@ void goalFunction(int n) {
 		int end = 1;
 		int totalSum = 0;
 		int minSum = INT_MAX;
-		int start;
-		for (start = 0; start < oligonucleotydes.size(); start++)
+		numberOfOligonucleotydes[i] = 0;
+		int startMin = 0;
+		for (int start = 0; start < oligonucleotydes.size(); start++)
 		{
 			totalSum += costMatrix[population[i][start]][population[i][(start+1)%oligonucleotydes.size()]];
 			int prev = end - 1;
@@ -139,34 +139,35 @@ void goalFunction(int n) {
 				prev += oligonucleotydes.size();
 			while (len + costMatrix[population[i][prev]][population[i][end]] + 1 <= n )
 			{
-				prev = end - 1;
-				if (prev < 0)
-					prev += oligonucleotydes.size();
 				sum1 += costMatrix[population[i][prev]][population[i][end]];
 				len += costMatrix[population[i][prev]][population[i][end]] + 1;
 				end= (end + 1) % oligonucleotydes.size();
+				prev = end - 1;
+				if (prev < 0)
+					prev += oligonucleotydes.size();
 			}
+			
 			if (sum1 < minSum) {
 				minSum = sum1;
-				numberOfOligonucleotydes[i] = (end - start + oligonucleotydes.size()) % oligonucleotydes.size();
+				startMin = start;
 			}
-			if (sum1 < 0)
-				throw new exception();
+			if ((end - start + oligonucleotydes.size()) % oligonucleotydes.size() > numberOfOligonucleotydes[i])
+				numberOfOligonucleotydes[i] = (end - start + oligonucleotydes.size()) % oligonucleotydes.size();
 			sum1 -= costMatrix[population[i][start]][population[i][(start + 1) % oligonucleotydes.size()]];
 			len -= costMatrix[population[i][start]][population[i][(start + 1) % oligonucleotydes.size()]] + 1;
 		}
 
-		int goal = (int)(0.5 * sum1) + totalSum;
+		int goal = (int)(0.5 * minSum) + totalSum;
 		goalFunctionValues[i] = goal;
-		/*
+		
 		int * individual = new int[oligonucleotydes.size()];
 		for (int j = 0; j < oligonucleotydes.size(); j++)
 		{
-			individual[j] = population[i][(j+start)%oligonucleotydes.size()];
+			individual[j] = population[i][(j+ startMin)%oligonucleotydes.size()];
 		}
 		delete(population[i]);
 		population[i] = individual;
-		*/
+		
 	}
 }
 
@@ -514,12 +515,14 @@ int main()
 	goalFunctionValues = new int[population.size()];
 	numberOfOligonucleotydes = new int[population.size()];
 	goalFunction(n);
+	/*
 	for (int i = 0; i < oligonucleotydes.size(); i++) {
 		printf("%d ", population[0][i]);
-	}
+	}*/
 	printf("\n");
 	int id = findTheBestIndividual();
-	printf("Najelpszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d\n", goalFunctionValues[id], numberOfOligonucleotydes[id], n);
+	printf("Najelpszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d\n", goalFunctionValues[0], numberOfOligonucleotydes[0], n);
+	
 	while (true) {
 		crossing(population.size());
 		mutation(u);
@@ -529,17 +532,17 @@ int main()
 
 	}
 	
-
+	/*
 	for (int i = 0; i < oligonucleotydes.size(); i++) {
 		for (int j = 0; j < oligonucleotydes.size(); j++) {			
 			printf("%d ", costMatrix[i][j]);
 		}
 		printf("\n");
-	}
+	}*/
 
 	//printf("%d", calcLen(oligonucleotydes[0], oligonucleotydes[0]));
 	
-	clear();
+	//clear();
 	system("pause");
     return 0;
 }
