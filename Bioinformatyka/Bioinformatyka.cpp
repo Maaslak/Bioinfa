@@ -14,7 +14,7 @@
 
 using namespace std;
 
-const int l = 10, s = 10, c = 209, u = 5, d = 0;
+const int l = 10, s = 10, c = 209, u = 30, d = 0;
 vector<char*> oligonucleotydes;
 vector<int*> population;
 int** costMatrix = NULL;
@@ -54,7 +54,7 @@ void clearVec2(vector<int*> vec) {
 
 // Calculates len of connection of two specific oligonucleotydes
 int calcLen(char* a, char* b) {
-	int len = l;
+	int len = l - 1;
 	for (int i = 0; i < l - 1; i++)
 	{
 		bool fit = true;
@@ -103,14 +103,13 @@ void createPopulation(int div = 2) {
 void goalFunction(int n) {
 	for (int i = 0; i < population.size(); i++) {
 		
-		int sum1 , sum2, len;
+		int sum1 , len;
 		len = l;
 		sum1 = 0;
-		sum2 = 0;
 		
 		int end = 1;
 		int totalSum = 0;
-		int maxSum = 0;
+		int minSum = INT_MAX;
 		int start;
 		for (start = 0; start < oligonucleotydes.size(); start++)
 		{
@@ -127,18 +126,19 @@ void goalFunction(int n) {
 				len += costMatrix[population[i][prev]][population[i][end]] + 1;
 				end= (end + 1) % oligonucleotydes.size();
 			}
-			if (sum1 > maxSum) {
-				maxSum = sum1;
+			if (sum1 < minSum) {
+				minSum = sum1;
 				numberOfOligonucleotydes[i] = (end - start + oligonucleotydes.size()) % oligonucleotydes.size();
 			}
 			if (sum1 < 0)
 				throw new exception();
-			sum1 -= costMatrix[population[i][start]][population[i][(start+1)%oligonucleotydes.size()]];
+			sum1 -= costMatrix[population[i][start]][population[i][(start + 1) % oligonucleotydes.size()]];
 			len -= costMatrix[population[i][start]][population[i][(start + 1) % oligonucleotydes.size()]] + 1;
 		}
 
 		int goal = (int)(0.5 * sum1) + totalSum;
 		goalFunctionValues[i] = goal;
+		/*
 		int * individual = new int[oligonucleotydes.size()];
 		for (int j = 0; j < oligonucleotydes.size(); j++)
 		{
@@ -146,6 +146,7 @@ void goalFunction(int n) {
 		}
 		delete(population[i]);
 		population[i] = individual;
+		*/
 	}
 }
 
