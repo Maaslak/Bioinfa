@@ -14,13 +14,14 @@
 
 using namespace std;
 
-const int l = 10, s = 10, c = 209, u = 50, d = 0;
+const int l = 10, s = 10, c = 209, u = 5, d = 0;
 vector<char*> oligonucleotydes;
-vector<int*> population;
+vector<pair<int*, int>> population;
 int** costMatrix = NULL;
-int* goalFunctionValues = NULL;
+vector <vector <int>> costIntegrals;
 int *numberOfOligonucleotydes = NULL;
 int n;
+
 
 void parseInput(char* filepath) {	
 	FILE* file = fopen(filepath, "r");
@@ -43,10 +44,9 @@ void clearVec(vector<char*> vec) {
 	}
 }
 
-void clearVec2(vector<int*> vec) {
+void clearVec2(vector<pair<int*, int>> vec) {
 	while (!vec.empty()) {
-		int* el = vec.back();
-		delete(el);
+		delete(vec.back().first);
 		vec.pop_back();
 	}
 }
@@ -75,12 +75,25 @@ int calcLen(char* a, char* b) {
 
 void initCostMatrix() {
 	costMatrix = new int*[oligonucleotydes.size()];
-	for (int i = 0; i < oligonucleotydes.size(); i++)
+	for (int i = 0; i < oligonucleotydes.size(); i++) {
 		costMatrix[i] = new int[oligonucleotydes.size()];
-	for (int i = 0; i < oligonucleotydes.size(); i++)
-		for (int j = 0; j < oligonucleotydes.size(); j++)
+	}
+	for (int i = 0; i < oligonucleotydes.size(); i++) {
+		vector<int> tempVec;
+		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			costMatrix[i][j] = calcLen(oligonucleotydes[i], oligonucleotydes[j]);
-	
+			int add = l - (costMatrix[i][j] + 1);
+			add *= add;
+			if (j == 0) {
+				tempVec.push_back(add);
+			}
+			else
+			{
+				tempVec.push_back(tempVec[j - 1] + add);
+			}
+		}
+		costIntegrals.push_back(tempVec);
+	}
 }
 void initialize(char* problemPath) {
 	parseInput(problemPath);
@@ -88,33 +101,36 @@ void initialize(char* problemPath) {
 	
 }
 
-void createPopulation(int div = 2) {
+void createPopulation(float div = 1) {
+	
 	map<int, int> oliMap;
-	population.push_back(new int[oligonucleotydes.size()]);
-	population[0][0] = 0;
+	population.push_back(make_pair( new int[oligonucleotydes.size()], 0));
+	population[0].first[0] = 0;
 	oliMap.insert(pair<int, int>(0, 0));
 	int sum = 10, wyn = 0;
+
 	for (int j = 1; j < oligonucleotydes.size(); j++) {
 		int min = INT_MAX, id = -1;
 		for (int k = 0; k < oligonucleotydes.size(); k++) {
-			if ((costMatrix[population[0][j - 1]][k] < min) && !oliMap.count(k)) {
-				min = costMatrix[population[0][j - 1]][k];
+			if ((costMatrix[population[0].first[j - 1]][k] < min) && !oliMap.count(k)) {
+				min = costMatrix[population[0].first[j - 1]][k];
 				id = k;
 			}
 		}
-		population[0][j] = id;
-		sum += costMatrix[population[0][j - 1]][id] + 1;
+		population[0].first[j] = id;
+		sum += costMatrix[population[0].first[j - 1]][id] + 1;
 		if (sum <= 209)
 			wyn++;
 		oliMap.insert(pair<int, int>(id, id));
 	}
 	
-	for (int i = 1; i < oligonucleotydes.size()/ div; i++) {
-		population.push_back(new int[oligonucleotydes.size()]);
+	
+	for (int i = 1; i < (int)(oligonucleotydes.size()/ div); i++) {
+		population.push_back(make_pair( new int[oligonucleotydes.size()], 0));
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
-			population[i][j] = j;			
+			population[i].first[j] = j;
 		}
-		random_shuffle(&population[i][0], &population[i][oligonucleotydes.size()]);
+		random_shuffle(&population[i].first[0], &population[i].first[oligonucleotydes.size()]);
 	}
 }
 
@@ -133,14 +149,14 @@ void goalFunction(int n) {
 		int startMin = 0;
 		for (int start = 0; start < oligonucleotydes.size(); start++)
 		{
-			totalSum += costMatrix[population[i][start]][population[i][(start+1)%oligonucleotydes.size()]];
+			totalSum += costMatrix[population[i].first[start]][population[i].first[(start+1)%oligonucleotydes.size()]];
 			int prev = end - 1;
 			if (prev < 0)
 				prev += oligonucleotydes.size();
-			while (len + costMatrix[population[i][prev]][population[i][end]] + 1 <= n )
+			while (len + costMatrix[population[i].first[prev]][population[i].first[end]] + 1 <= n )
 			{
-				sum1 += costMatrix[population[i][prev]][population[i][end]];
-				len += costMatrix[population[i][prev]][population[i][end]] + 1;
+				sum1 += costMatrix[population[i].first[prev]][population[i].first[end]];
+				len += costMatrix[population[i].first[prev]][population[i].first[end]] + 1;
 				end= (end + 1) % oligonucleotydes.size();
 				prev = end - 1;
 				if (prev < 0)
@@ -153,21 +169,23 @@ void goalFunction(int n) {
 			}
 			if ((end - start + oligonucleotydes.size()) % oligonucleotydes.size() > numberOfOligonucleotydes[i])
 				numberOfOligonucleotydes[i] = (end - start + oligonucleotydes.size()) % oligonucleotydes.size();
-			sum1 -= costMatrix[population[i][start]][population[i][(start + 1) % oligonucleotydes.size()]];
-			len -= costMatrix[population[i][start]][population[i][(start + 1) % oligonucleotydes.size()]] + 1;
+			sum1 -= costMatrix[population[i].first[start]][population[i].first[(start + 1) % oligonucleotydes.size()]];
+			len -= costMatrix[population[i].first[start]][population[i].first[(start + 1) % oligonucleotydes.size()]] + 1;
 		}
 
-		int goal = (int)(0.5 * minSum) + totalSum;
-		goalFunctionValues[i] = goal;
-		
+		int goal = (int)(0.5 * minSum) + totalSum;// -numberOfOligonucleotydes[i];
+		//goalFunctionValues[i] = goal;
+		population[i].second = goal;
+		/*
 		int * individual = new int[oligonucleotydes.size()];
 		for (int j = 0; j < oligonucleotydes.size(); j++)
 		{
 			individual[j] = population[i][(j+ startMin)%oligonucleotydes.size()];
 		}
 		delete(population[i]);
+
 		population[i] = individual;
-		
+		*/
 	}
 }
 
@@ -201,11 +219,11 @@ int* chooseIndividuals(int c) {
 	}
 
 	for (int i = 0; i < c - 2; i+=3) {
-		if (goalFunctionValues[lot[i]] <= goalFunctionValues[lot[i + 1]] && goalFunctionValues[lot[i]] <= goalFunctionValues[lot[i + 2]]) {
+		if (population[lot[i]].second <= population[lot[i + 1]].second && population[lot[i]].second <= population[lot[i + 2]].second) {
 			finalLot[i/3] = lot[i];
-		}else if (goalFunctionValues[lot[i]] >= goalFunctionValues[lot[i + 1]] && goalFunctionValues[lot[i + 1]] <= goalFunctionValues[lot[i + 2]]) {
+		}else if (population[lot[i]].second >= population[lot[i + 1]].second && population[lot[i + 1]].second <= population[lot[i + 2]].second) {
 			finalLot[i/3] = lot[i + 1];
-		}else if (goalFunctionValues[lot[i]] >= goalFunctionValues[lot[i + 2]] && goalFunctionValues[lot[i + 1]] >= goalFunctionValues[lot[i + 2]]) {
+		}else if (population[lot[i]].second >= population[lot[i + 2]].second && population[lot[i + 1]].second >= population[lot[i + 2]].second) {
 			finalLot[i/3] = lot[i + 2];
 		}
 	}
@@ -214,10 +232,10 @@ int* chooseIndividuals(int c) {
 }
 
 int findTheBestIndividual() {
-	int min = INT_MAX, id = -1;;
+	int max = INT_MIN, id = -1;;
 	for (int i = 0; i < population.size(); i++) {
-		if (goalFunctionValues[i] < min) {
-			min = goalFunctionValues[i];
+		if (numberOfOligonucleotydes[i] > max) {
+			max = numberOfOligonucleotydes[i];
 			id = i;
 		}
 	}
@@ -230,6 +248,28 @@ void mutation(int u) {
 	for (int i = 0; i < population.size(); i++) {
 		int rnd = rand() % 100;
 		if (rnd < u) {
+			int max = INT_MIN, id = -1;
+			max = costMatrix[population[i].first[oligonucleotydes.size() - 1]][population[i].first[0]] + costMatrix[population[i].first[0]][population[i].first[1]];
+			id = 0;
+			for (int j = 1; j < oligonucleotydes.size() - 1; j++) {
+				if (costMatrix[population[i].first[j - 1]][population[i].first[j]] + costMatrix[population[i].first[j]][population[i].first[j + 1]] > max) {
+					max = costMatrix[population[i].first[j - 1]][population[i].first[j]] + costMatrix[population[i].first[j]][population[i].first[j + 1]];
+					id = j;
+				}
+			}
+
+			int rnd = rand() % costIntegrals[population[i].first[id]][oligonucleotydes.size() - 1];
+			vector<int>::iterator up = upper_bound((costIntegrals[population[i].first[id]]).begin(), (costIntegrals[population[i].first[id]]).end(), rnd);
+			int oligonucleotydeToSwap = up - costIntegrals[population[i].first[id]].begin();
+			//printf("%d ", costMatrix[population[i].first[id]][oligonucleotydeToSwap]);
+			int * oligonucleotydeAdrr = find(population[i].first, population[i].first + oligonucleotydes.size(), oligonucleotydeToSwap);
+			int id2 = oligonucleotydeAdrr - population[i].first;
+			//printf("%d ", costMatrix[population[i].first[id]][population[i].first[id2]]);
+			id2--;
+			if (id2 < 0)
+				id2 = oligonucleotydes.size() - 1;
+			swap(population[i].first[id], population[i].first[id2]);
+			/*
 			int max = INT_MIN, id = -1;
 			max = costMatrix[population[i][oligonucleotydes.size()-1]][population[i][0]] + costMatrix[population[i][0]][population[i][1]];
 			id = 0;
@@ -252,7 +292,7 @@ void mutation(int u) {
 				}
 			}
 			swap(population[i][id], population[i][id2]);
-
+			*/
 			/*int id11 = 0, id21 = 0, id12 = 0, id22 = 0, sum1 = 0, sum2 = 0;
 			if (id - 1 < 0)
 				id11 = id - 1 + oligonucleotydes.size();
@@ -298,9 +338,70 @@ void mutation(int u) {
 	}
 }
 
+void mutation2(int u) {
+	for (int i = 0; i < population.size(); i++) {
+		int rnd = rand() % 100;
+		if (rnd < u) {
+			int max = INT_MIN, id = -1;
+			max = costMatrix[population[i].first[oligonucleotydes.size() - 1]][population[i].first[0]] + costMatrix[population[i].first[0]][population[i].first[1]];
+			id = 0;
+			for (int j = 1; j < oligonucleotydes.size() - 1; j++) {
+				if (costMatrix[population[i].first[j]][population[i].first[j + 1]] > max) {
+					max = costMatrix[population[i].first[j - 1]][population[i].first[j]] + costMatrix[population[i].first[j]][population[i].first[j + 1]];
+					id = j;
+				}
+			}
+
+			int id11 = 0, id21 = 0, id12 = 0, id22 = 0, sum1 = 0, sum2 = 0;
+			if (id - 1 < 0)
+				id11 = id - 1 + oligonucleotydes.size();
+			else
+				id11 = id - 1;
+			if (id - 2 < 0)
+				id21 = id - 2 + oligonucleotydes.size();
+			else
+				id21 = id - 2;
+
+			sum1 = costMatrix[population[i].first[id21]][population[i].first[id]] + costMatrix[population[i].first[id]][population[i].first[id11]];
+
+			if (id + 1 >= oligonucleotydes.size())
+				id12 = id + 1 - oligonucleotydes.size();
+			else
+				id12 = id + 1;
+			if (id + 2 >= oligonucleotydes.size())
+				id22 = id + 2 - oligonucleotydes.size();
+			else
+				id22 = id + 2;
+
+			sum2 = costMatrix[population[i].first[id12]][population[i].first[id]] + costMatrix[population[i].first[id]][population[i].first[id22]];
+
+			if (sum1 > sum2)
+				swap(population[i].first[id], population[i].first[id11]);
+			else
+				swap(population[i].first[id], population[i].first[id12]);
+
+			/*
+			int minCost = INT_MAX;
+			for (int k = 0; k < n - 1; k++) {
+			if (k != id ) {
+			int tempCost = costMatrix[k][id];
+			}
+			}
+			/*
+			if (costMatrix[id][tmp2] > costMatrix[tmp1][id])
+			swap(population[i][id], population[i][tmp1]);
+			else
+			swap(population[i][id], population[i][tmp2]);
+			*/
+		}
+	}
+}
+
+bool comp(pair<int*, int> i, pair<int*, int> j) { return (i.second < j.second); }
+
 //Start crossing
 void crossing(int c) {
-	vector<int*> newPopulation;
+	vector<pair<int*, int>> newPopulation;
 
 	int* finalLot = chooseIndividuals(c);
 	
@@ -308,20 +409,17 @@ void crossing(int c) {
 	list<int> individual2;
 	list<int>::iterator it1 = individual1.begin();
 	list<int>::iterator it2 = individual2.begin();
-	map<int, int> individualMap1;
-	map<int, int> individualMap2;
+	
+	bool* individualMap1 = new bool[oligonucleotydes.size()];
+	bool* individualMap2 = new bool[oligonucleotydes.size()];
 
 	
 
 	for (int i = 0; i < c / 3 - 1 ; i++) {
 		individual1.clear();
 		individual2.clear();
-		individualMap1.clear();
-		individualMap2.clear();
-		for (int i = 0; i < oligonucleotydes.size(); i++) {
-			individualMap1.insert(pair<int,int>(i, i));
-			individualMap2.insert(pair<int,int>(i, i));
-		}
+		for (int j = 0; j < oligonucleotydes.size(); j++)
+			individualMap1[j] = individualMap2[j] = false;
 
 		int startRand = rand() % (oligonucleotydes.size() - 2) + 1;
 		int endRand = rand() % (oligonucleotydes.size() - 2) + 1;
@@ -329,102 +427,102 @@ void crossing(int c) {
 		if (endRand < startRand)
 			swap(endRand, startRand);
 
+
 		for (int j = startRand; j <= endRand; j++) {
-			individual1.push_back(population[finalLot[i]][j]);
-			individualMap1.erase(population[finalLot[i]][j]);
-			individual2.push_back(population[finalLot[i+1]][j]);
-			individualMap2.erase(population[finalLot[i + 1]][j]);
+			individual1.push_back(population[finalLot[i]].first[j]);
+			individualMap1[population[finalLot[i]].first[j]] = true;
+			individual2.push_back(population[finalLot[i+1]].first[j]);
+			individualMap2[population[finalLot[i + 1]].first[j]] = true;
 		}
 
 
 		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {	
-			if (find(individual1.begin(), individual1.end(), population[finalLot[i + 1]][j]) != individual1.end()) {
-				individual1.push_back(population[finalLot[i + 1]][j]);
-				individualMap1.erase(population[finalLot[i + 1]][j]);
+			if (!individualMap1[population[finalLot[i + 1]].first[j]]) {
+				individual1.push_back(population[finalLot[i + 1]].first[j]);
+				individualMap1[population[finalLot[i + 1]].first[j]] = true;
 			}
 		}
 
 		for (int j = endRand + 1; j < oligonucleotydes.size(); j++) {
-			if (find(individual2.begin(), individual2.end(), population[finalLot[i]][j]) != individual2.end()) {
-				individual2.push_back(population[finalLot[i]][j]);
-				individualMap2.erase(population[finalLot[i]][j]);
+			if (!individualMap2[population[finalLot[i]].first[j]]) {
+				individual2.push_back(population[finalLot[i]].first[j]);
+				individualMap2[population[finalLot[i]].first[j]] = true;
 			}
 		}
 
 		for (int j = startRand - 1; j >= 0; j--) {
-			if (find(individual2.begin(), individual2.end(), population[finalLot[i]][j]) != individual2.end()) {
-				individual2.push_front(population[finalLot[i]][j]);
-				individualMap2.erase(population[finalLot[i]][j]);
+			if (!individualMap2[population[finalLot[i]].first[j]]) {
+				individual2.push_front(population[finalLot[i]].first[j]);
+				individualMap2[population[finalLot[i]].first[j]] = true;
 			}
 		}
 
 		for (int j = startRand - 1; j >= 0; j--) {
-			if (find(individual1.begin(), individual1.end(), population[finalLot[i + 1]][j]) != individual1.end()) {
-				individual1.push_front(population[finalLot[i + 1]][j]);
-				individualMap1.erase(population[finalLot[i + 1]][j]);
+			if (!individualMap1[population[finalLot[i + 1]].first[j]]) {
+				individual1.push_front(population[finalLot[i + 1]].first[j]);
+				individualMap1[population[finalLot[i + 1]].first[j]] = true;
 			}
 		}
 
-		for (map<int, int>::iterator it = individualMap1.begin(); it != individualMap1.end(); ++it) {
-			int value = it->second;
-			int min = INT_MAX, id = - 1;
+		list<int> missing1, missing2;
+
+		for (int j = 0; j < oligonucleotydes.size(); j++) {
+			if (!individualMap1[j])
+				missing1.push_back(j);
+			if (!individualMap2[j])
+				missing2.push_back(j);
+		}
+		
+		
+		for (list<int>::iterator it = missing1.begin(); it != missing1.end(); ++it) {
+			int value = *it;
+			int min = INT_MAX;
 			list<int>::iterator itt = individual1.begin();
 			min = costMatrix[individual1.back()][value] + costMatrix[value][individual1.front()];
-			id = 0;
+			list<int>::iterator id = individual1.begin();
 			++itt;
-			int i = 1;
-			for (itt; itt != individual1.end(); ++itt) {	
-				++itt;
-				if (itt == individual1.end())
+			list<int>::iterator prev = individual1.begin();
+			for (itt; itt != individual1.end(); ++itt, prev++) {	
+				if (next(itt) == individual1.end())
 					break;
-				--itt;
 				int sum = costMatrix[value][*(itt)];
-				--itt;
-				sum += costMatrix[*(itt)][value];
-				++itt;
+				sum += costMatrix[*(prev)][value];
 				if (sum < min) {
 					min = sum;
-					id = i;
+					id = itt;
+					if (min == 0)
+						break;
 				}
-				i++;
 			}
-			itt = individual1.begin();
-			for (int i = 0; i < id; i++)
-				++itt;
-			individual1.insert(itt, value);
+			
+			individual1.insert(id, value);
 		}
+		
 
-
-		for (map<int, int>::iterator it = individualMap2.begin(); it != individualMap2.end(); ++it) {
-			int value = it->second;
-			int min = INT_MAX, id = -1;
+		
+		for (list<int>::iterator it = missing2.begin(); it != missing2.end(); ++it) {
+			int value = *it;
+			int min = INT_MAX;
 			list<int>::iterator itt = individual2.begin();
 			min = costMatrix[individual2.back()][value] + costMatrix[value][individual2.front()];
-			id = 0;
+			list<int>::iterator id = individual2.begin();
+			list<int>::iterator prev = individual2.begin();
 			++itt;
-			int i = 1;
-			for (itt; itt != individual2.end(); ++itt) {
-				++itt;
-				if (itt == individual2.end())
+			for (itt; itt != individual2.end(); ++itt, ++prev) {
+				if (next(itt) == individual2.end())
 					break;
-				--itt;
 				int sum = costMatrix[value][*itt];
-				--itt;
-				sum += costMatrix[*itt][value];
-				++itt;
+				sum += costMatrix[*prev][value];
 				if (sum < min) {
 					min = sum;
-					id = i;
+					id = itt;
+					if (min == 0)
+						break;
 				}
-				i++;
 			}
-			itt = individual2.begin();
-			for (int i = 0; i < id; i++)
-				++itt;
-			individual2.insert(itt, value);
+			individual2.insert(id, value);
 		}
-			
-
+		
 
 		/*printf("Individual1: \n");
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
@@ -456,7 +554,7 @@ void crossing(int c) {
 			printf("%d ", tmp[z]);
 		}
 		printf("\n");*/
-		newPopulation.push_back(tmp);
+		newPopulation.push_back(make_pair(tmp, 0));
 		//delete(tmp);
 		tmp = new int[individual2.size()];
 		ii = 0;
@@ -464,23 +562,28 @@ void crossing(int c) {
 			tmp[ii] = *iterator;
 			ii++;
 		}
-		newPopulation.push_back(tmp);
+		newPopulation.push_back(make_pair(tmp, 0));
 		//delete(tmp);
 	}
+	delete(individualMap1);
+	delete(individualMap2);
 
-	int iter = 0;
+	
 
 	int populationSize = population.size();
-	while (newPopulation.size() < populationSize) {
-		int id = findTheBestIndividual();
-		swap(population[population.size()-1], population[id]);
-		newPopulation.push_back(population[population.size()-1]);
+
+	partial_sort(population.begin(), population.begin() + (population.size() - newPopulation.size()), population.end(), comp);
+	while (population.size() + newPopulation.size() != populationSize) {
+		delete(population.back().first);
 		population.pop_back();
-		iter++;
+	}
+	while (!population.empty()) {
+		newPopulation.push_back(population.back());
+		population.pop_back();
 	}
 
 
-	clearVec2(population);
+	//clearVec2(population);
 		/*int *end = population[i] + oligonucleotydes.size();
 		int *result = find(population[i], end, 0);
 		if (result == end) {
@@ -498,21 +601,19 @@ void clear() {
 		delete(costMatrix[i]);
 	}
 	for (int i = 0; i < oligonucleotydes.size()/2; i++) {
-		delete(population[i]);
+		delete(population[i].first);
 	}
 	delete(costMatrix);
-	delete(goalFunctionValues);
 	delete(numberOfOligonucleotydes);
 	clearVec(oligonucleotydes);
 }
 
 int main()
 {
-	n = 209;
+	n = 509;
 	srand(time(0));
-	initialize("9200-40.txt");
+	initialize("53500-200.txt");
 	createPopulation();
-	goalFunctionValues = new int[population.size()];
 	numberOfOligonucleotydes = new int[population.size()];
 	goalFunction(n);
 	/*
@@ -521,14 +622,14 @@ int main()
 	}*/
 	printf("\n");
 	int id = findTheBestIndividual();
-	printf("Najelpszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d\n", goalFunctionValues[0], numberOfOligonucleotydes[0], n);
+	printf("Najelpszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d\n", population[0].second, numberOfOligonucleotydes[0], n);
 	
 	while (true) {
 		crossing(population.size());
 		mutation(u);
 		goalFunction(n);
 		int id = findTheBestIndividual();
-		printf("Najelpszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d\n", goalFunctionValues[id], numberOfOligonucleotydes[id], n);
+		printf("Najelpszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d\n", population[id].second, numberOfOligonucleotydes[id], n);
 
 	}
 	
