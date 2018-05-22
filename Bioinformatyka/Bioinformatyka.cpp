@@ -610,9 +610,17 @@ void clear() {
 
 int main()
 {
+	string negLos[] = { "testy\\neg-los\\10.500-100", "testy\\neg-los\\10.500-200", "testy\\neg-los\\18.200-40", "testy\\neg-los\\18.200-80", "testy\\neg-los\\20.300-120", "testy\\neg-los\\20.300-60", "testy\\neg-los\\25.500-100", "testy\\neg-los\\25.500-200", "testy\\neg-los\\35.200-40", "testy\\neg-los\\35.200-80", "testy\\neg-los\\53.500-100", "testy\\neg-los\\53.500-200", "testy\\neg-los\\55.300-120", "testy\\neg-los\\55.300-60", "testy\\neg-los\\55.400-160", "testy\\neg-los\\55.400-80", "testy\\neg-los\\58.300-120", "testy\\neg-los\\58.300-60", "testy\\neg-los\\62.400-160", "testy\\neg-los\\62.400-80", "testy\\neg-los\\68.400-160", "testy\\neg-los\\68.400-80", "testy\\neg-los\\9.200-40", "testy\\neg-los\\9.200-80" };
+	int negLosN[] = { 509, 509,209,209,309,309,509,509,209,209,509,509,309,309,409,409,309,309,409,409,409,409,209,209 };
+	string negPow[] = { "testy\\neg-pow\\113.500-8", "testy\\neg-pow\\144.500-12", "testy\\neg-pow\\28.500-18", "testy\\neg-pow\\34.500-32", "testy\\neg-pow\\59.500-2" };
+	int negPowN[] = { 509, 509, 509, 509, 509 };
+	string pozLos[] = { "testy\\poz-los\\10.500+200", "testy\\poz-los\\18.200+80", "testy\\poz-los\\20.300+120", "testy\\poz-los\\25.500+200", "testy\\poz-los\\35.200+80", "testy\\poz-los\\53.500+200", "testy\\poz-los\\55.300+120", "testy\\poz-los\\55.400+160", "testy\\poz-los\\58.300+120", "testy\\poz-los\\62.400+160", "testy\\poz-los\\68.400+160", "testy\\poz-los\\9.200+80" };
+	int pozLosN[] = { 509,209,309,509,209,509,309,409,309,409,409,209 };
+	string pozOli[] = { "testy\\poz-oli\\10.500+50", "testy\\poz-oli\\18.200+20", "testy\\poz-oli\\20.300+30", "testy\\poz-oli\\25.500+50", "testy\\poz-oli\\35.200+20", "testy\\poz-oli\\53.500+50", "testy\\poz-oli\\55.300+30", "testy\\poz-oli\\55.400+40", "testy\\poz-oli\\58.300+30", "testy\\poz-oli\\62.400+40", "testy\\poz-oli\\68.400+40", "testy\\poz-oli\\9.200+20" };
+	int pozOliN[] = { 509,209,309,509,209,509,309,409,309,409,409,209 };
 	n = 509;
 	srand(time(0));
-	initialize("53500-200.txt");
+	initialize("53.500-200");
 	createPopulation();
 	numberOfOligonucleotydes = new int[population.size()];
 	goalFunction(n);
