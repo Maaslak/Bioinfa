@@ -47,6 +47,7 @@ Krzyżowanie zaczyna się w dokładnie taki sam sposób jak było w naszym pierw
 \includegraphics[width=0.5\textwidth]{Czasneg-los-greedy4.png}
 \caption{Porównanie algorytmu dla błędów negatywnych, losowych bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
 \end{figure}
+Jak widać, dla błędów negatywnych losowych algorytm otrzymuje rozwiązanie o średniej dokładności 90%. W algorytmie z początkowym algorytmem zachłannym (wykresy po prawej) widać że otrzymuje on średnio lepsze wyniki z prostej przyczyny początkowego uszeregowania które ma bardzo dobrą jakość rozwiązania. Powodem tego są rodzaje testów, które bardzo dobrze są rozwiązywane przez algorytm zachłanny. Nie zmienia to jednak faktu, że algorytm bez początkowego rozpoczęcia zachłannego uzyskuje podobne wyniki, a funkcja poprawnie zbiega do celu.
 \subsection{Wyniki algorytmu dla błędów negatywnych na końcach sekwencji}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{neg-pow1.png}
@@ -58,6 +59,7 @@ Krzyżowanie zaczyna się w dokładnie taki sam sposób jak było w naszym pierw
 \includegraphics[width=0.5\textwidth]{Czasneg-pow-greedy1.png}
 \caption{Porównanie algorytmu dla błędów negatywnych na końcach sekwencji bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
 \end{figure}
+W przypadku  błędów negatywnych na końcach sekwencji wyniki są zbliżone do błędów negatywnych losowych i zachowują taką samą własność.
 \subsection{Wyniki algorytmu dla błędów pozytywnych, losowych}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{poz-los1.png}
@@ -73,6 +75,7 @@ Krzyżowanie zaczyna się w dokładnie taki sam sposób jak było w naszym pierw
 \includegraphics[width=0.5\textwidth]{Czaspoz-los-greedy2.png}
 \caption{Porównanie algorytmu dla błędów pozytywnych, losowych bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
 \end{figure}
+Dla błędów pozytywnych losowych nasz algorytm nie działa już tak dobrze. Jak widać algorytm bez początku zachłannego uzyskuje średnie wyniki w okolicach 60%. Jest do dość słaby wynik. Dodatkowo algorytm z początkiem zachłannym tylko pogarsza swoje wyniki po lepszym wyniku zachłannym, żeby ostatecznie dojść do prawie takiego samego wyniku jak algorytm bez początku zachłannego.  
 \subsection{Wyniki algorytmu dla błędów pozytywnych, na końcach sekwencji}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{poz-oli1.png}
@@ -88,6 +91,7 @@ Krzyżowanie zaczyna się w dokładnie taki sam sposób jak było w naszym pierw
 \includegraphics[width=0.5\textwidth]{Czaspoz-oli-greedy2.png}
 \caption{Porównanie algorytmu dla błędów pozytywnych na końcach sekwencji bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
 \end{figure}
+Ostatnią kategorią są błędy pozytywne z przekłamaniami na końcach oligonukleotydów. Jak widać radzi on sobie odrobinę lepiej niż dla błędów pozutywnych losowych, dodatkowo algorytm z rozpoczęciem zachłannym nie maleje aż tak bardzo (algorytm zachłanny ma większe problemy z optymalnym ustawieniem i jego wykonanie nie powoduje od razu ustawienia pierwszej iteracji na wysokości 90-95%, a nieco niżej na 70-80%).
 \section{Wnioski}
 \end{document}
 
