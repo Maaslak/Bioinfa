@@ -18,7 +18,7 @@
 \begin{document}
 \maketitle
 \section{Zmiany w algorytmie}  
-Po zaimplementowaniu algorytmu i zauważeniu jego słabych osiągnięć, zdecydowano by wprowadzić zmiany w zastosowanym podejściu algorytmicznym. Poniżej w kilku sekcjach omówiono te cześci algorytmu, które zostały zastąpione.
+Po zaimplementowaniu algorytmu i zauważeniu jego słabych osiągnięć, zdecydowano by wprowadzić zmiany w zastosowanym podejściu algorytmicznym. Poniżej w kilku sekcjach omówiono te cześci algorytmu, które zostały zastąpione. Dodatkowo wybrane zostało kryterium stopu jako 200 iteracji algorytmu.
 \subsection{Kodowanie}
 Zmiana w kodowaniu polega na traktowaniu osobnika jako cykliczny, spowodowało to że każdy osobnik jest zbiórem rozwiązań z przesuniętym początkiem o jeden oligonukleotyd. Nie pogorszyło to złożoności obliczeniowej wyznaczania funkcji celu, która pozostała równa $O(n)$, gdzie $n$ jest długością osobnika. Pozwoliło natomiast na traktowanie jednego rozwiązania jako zbioru $n$ różnych rozwiązań i korzystania z tej części osobnika o najlepszym przystosowaniu.
 \subsection{Mutacje}
@@ -26,6 +26,7 @@ W funkcji odpowiedzialnej za dokonanie mutacji osobnika została zastosowana odr
 \subsection{Krzyżowanie}
 Krzyżowanie zaczyna się w dokładnie taki sam sposób jak w pierwotnym algorytmie, a mianowicie od pewnego wylosowanego przedziału przepisuje się oligonukleotydy do nowo tworzonego osobnika (kopiuje wycinek i wkleja go do nowego osobnika) z wybranego osobnika z populacji rodzicielskiej. Następnie uzupełniany jest koniec osobnika wartościami z innego osobnika z populacji rodzicielskiej, uważając oczywiście by dany oligonukleotyd nie został powtórzony. W ten sam sposób zostaje uzupełniony początek osobnika z nowej populacji. \\ Wszystkie oligonukleotydy które nie zostały dodane wstawiane są, w miejsca w których ich koszt będzie najmniejszy. Motywacją było przyspierzenie zbieżności algorytmu oraz zachowanie losowości dzięki losowemu doborowi punktów krzyżowania. Tym samy dając lepsze rozwiązania w krótszym czasie przetwarzania jak i dając możliwość na opuszczenie minimów lokalnych.
 \section{Testy}
+W testach mierzono upływ czasu, jak i zmiany jakości rozwiązań co 10 iteracji algorytmu, aby pokazać poprawę rozwiązań wraz z kolejnymi iteracjami. Jako jakość rozwiązania przyjęto stosunek ilości oligonukleotydów rozwiązania uzyskanego przez algorytm do ilości oligonukleotydów w rozwiązaniu optymalnym. Jakość wyrażamy w procentach.
 \subsection{Wyniki algorytmu dla błędów negatywnych, losowych}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{neg-los1.png}
@@ -36,7 +37,7 @@ Krzyżowanie zaczyna się w dokładnie taki sam sposób jak w pierwotnym algoryt
 \includegraphics[width=0.5\textwidth]{neg-los-greedy3.png}
 \includegraphics[width=0.5\textwidth]{neg-los4.png}
 \includegraphics[width=0.5\textwidth]{neg-los-greedy4.png}
-\caption{Porównanie algorytmu dla błędów negatywnych, losowych bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od ilości iteracji}
+\caption{Porównanie algorytmu dla błędów negatywnych, losowych bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od ilości iteracji.}
 \end{figure}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{Czasneg-los1.png}
@@ -47,35 +48,35 @@ Krzyżowanie zaczyna się w dokładnie taki sam sposób jak w pierwotnym algoryt
 \includegraphics[width=0.5\textwidth]{Czasneg-los-greedy3.png}
 \includegraphics[width=0.5\textwidth]{Czasneg-los4.png}
 \includegraphics[width=0.5\textwidth]{Czasneg-los-greedy4.png}
-\caption{Porównanie algorytmu dla błędów negatywnych, losowych bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
+\caption{Porównanie algorytmu dla błędów negatywnych, losowych bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od czasu przetwarzania}
 \end{figure}
-Jak widać, dla błędów negatywnych losowych algorytm otrzymuje rozwiązanie o średniej dokładności 90\%. W algorytmie z początkowym algorytmem zachłannym (wykresy po prawej) widać że otrzymuje on średnio lepsze wyniki z prostej przyczyny początkowego uszeregowania które ma bardzo dobrą jakość rozwiązania. Powodem tego są rodzaje testów, które bardzo dobrze są rozwiązywane przez algorytm zachłanny. Nie zmienia to jednak faktu, że algorytm bez początkowego rozpoczęcia zachłannego uzyskuje podobne wyniki, a funkcja poprawnie zbiega do celu.
+Jak widać, dla błędów negatywnych, losowych algorytm otrzymuje rozwiązanie o średniej jakości 90\%. W algorytmie z wykorzystaniem osobnika wygenerowanego przez algorytm zachłanny częściej uzyskiwane są lepsze wyniki z powodu początkowego uszeregowania które ma bardzo dobrą jakość. Rozwiązania algorytmu bez wykorzystania algorytmu zachłannego zbiegają do podobnej jakości wyników. Czasem jakość wyników jest nawet lepsza, prawdopodobnie ze względu na to, że osobniki za szybko upodabniają się do wyniku algorytmu zachłannego. Dodatkowo warto zauważyć, że wykresy po prawej stronie wskazują na polepszenie wyniku wygenerowanego przez algorytm zachłanny.
 \subsection{Wyniki algorytmu dla błędów negatywnych na końcach sekwencji}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{neg-pow1.png}
 \includegraphics[width=0.5\textwidth]{neg-pow-greedy1.png}
-\caption{Porównanie algorytmu dla błędów negatywnych na końcach sekwencji bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od ilości iteracji}
+\caption{Porównanie algorytmu dla błędów negatywnych na końcach sekwencji bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od ilości iteracji}
 \end{figure}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{Czasneg-pow1.png}
 \includegraphics[width=0.5\textwidth]{Czasneg-pow-greedy1.png}
-\caption{Porównanie algorytmu dla błędów negatywnych na końcach sekwencji bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
+\caption{Porównanie algorytmu dla błędów negatywnych na końcach sekwencji bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od czasu przetwarzania}
 \end{figure}
-W przypadku  błędów negatywnych na końcach sekwencji wyniki są zbliżone do błędów negatywnych losowych i zachowują taką samą własność.
+W przypadku błędów negatywnych na końcach sekwencji wyniki są zbliżone do wyników błędów negatywnych losowych. Różnicą jest fakt, że przy rozpoczęciu od wygenerowania losowej populacji początkowej zbieganie trwa dłużej.
 \subsection{Wyniki algorytmu dla błędów pozytywnych, losowych}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{poz-los1.png}
 \includegraphics[width=0.5\textwidth]{poz-los-greedy1.png}
 \includegraphics[width=0.5\textwidth]{poz-los2.png}
 \includegraphics[width=0.5\textwidth]{poz-los-greedy2.png}
-\caption{Porównanie algorytmu dla błędów pozytywnych, losowych bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od ilości iteracji}
+\caption{Porównanie algorytmu dla błędów pozytywnych, losowych bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od ilości iteracji}
 \end{figure}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{Czaspoz-los1.png}
 \includegraphics[width=0.5\textwidth]{Czaspoz-los-greedy1.png}
 \includegraphics[width=0.5\textwidth]{Czaspoz-los2.png}
 \includegraphics[width=0.5\textwidth]{Czaspoz-los-greedy2.png}
-\caption{Porównanie algorytmu dla błędów pozytywnych, losowych bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
+\caption{Porównanie algorytmu dla błędów pozytywnych, losowych bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od czasu przetwarzania}
 \end{figure}
 Dla błędów pozytywnych losowych nasz algorytm nie działa już tak dobrze. Jak widać algorytm bez początku zachłannego uzyskuje średnie wyniki w okolicach 60\%. Jest do dość słaby wynik. Dodatkowo algorytm z początkiem zachłannym tylko pogarsza swoje wyniki po lepszym wyniku zachłannym, żeby ostatecznie dojść do prawie takiego samego wyniku jak algorytm bez początku zachłannego.  
 \subsection{Wyniki algorytmu dla błędów pozytywnych, na końcach sekwencji}
@@ -84,14 +85,14 @@ Dla błędów pozytywnych losowych nasz algorytm nie działa już tak dobrze. Ja
 \includegraphics[width=0.5\textwidth]{poz-oli-greedy1.png}
 \includegraphics[width=0.5\textwidth]{poz-oli2.png}
 \includegraphics[width=0.5\textwidth]{poz-oli-greedy2.png}
-\caption{Porównanie algorytmu dla błędów pozytywnych na końcach sekwencji bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od ilości iteracji}
+\caption{Porównanie algorytmu dla błędów pozytywnych na końcach sekwencji bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od ilości iteracji}
 \end{figure}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{Czaspoz-oli1.png}
 \includegraphics[width=0.5\textwidth]{Czaspoz-oli-greedy1.png}
 \includegraphics[width=0.5\textwidth]{Czaspoz-oli2.png}
 \includegraphics[width=0.5\textwidth]{Czaspoz-oli-greedy2.png}
-\caption{Porównanie algorytmu dla błędów pozytywnych na końcach sekwencji bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
+\caption{Porównanie algorytmu dla błędów pozytywnych na końcach sekwencji bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od czasu przetwarzania}
 \end{figure}
 Ostatnią kategorią są błędy pozytywne z przekłamaniami na końcach oligonukleotydów. Jak widać radzi on sobie odrobinę lepiej niż dla błędów pozutywnych losowych, dodatkowo algorytm z rozpoczęciem zachłannym nie maleje aż tak bardzo (algorytm zachłanny ma większe problemy z optymalnym ustawieniem i jego wykonanie nie powoduje od razu ustawienia pierwszej iteracji na wysokości 90-95\%, a nieco niżej na 70-80\%).
 \section{Wnioski}
