@@ -15,7 +15,7 @@
 
 using namespace std;
 
-const int l = 10, s = 10, c = 209, u = 5, d = 0;
+const int l = 10, s = 10, c = 209, u = 100, d = 0;
 vector<char*> oligonucleotydes;
 vector<pair<int*, int>> population;
 int** costMatrix = NULL;
@@ -111,7 +111,7 @@ void createPopulation(float div = 1) {
 	oliMap.insert(pair<int, int>(0, 0));
 	int sum = 10, wyn = 0;
 
-	for (int j = 1; j < oligonucleotydes.size(); j++) {
+	/*for (int j = 1; j < oligonucleotydes.size(); j++) {
 		int min = INT_MAX, id = -1;
 		for (int k = 0; k < oligonucleotydes.size(); k++) {
 			if ((costMatrix[population2[0].first[j - 1]][k] < min) && !oliMap.count(k)) {
@@ -124,10 +124,10 @@ void createPopulation(float div = 1) {
 		if (sum <= 209)
 			wyn++;
 		oliMap.insert(pair<int, int>(id, id));
-	}
+	}*/
 	
 	
-	for (int i = 1; i < (int)(oligonucleotydes.size()/ div); i++) {
+	for (int i = 0; i < (int)(oligonucleotydes.size()/ div); i++) {
 		population2.push_back(make_pair( new int[oligonucleotydes.size()], 0));
 		for (int j = 0; j < oligonucleotydes.size(); j++) {
 			population2[i].first[j] = j;
@@ -629,8 +629,8 @@ int main()
 	outfile.open("wyniki.csv", std::ios_base::app);
 
 
-	int which = 0;
-	printf("\nPrzetwarzanie zestawu %s, o maksymalnej dlugosci %d\n", pozOli[which].c_str(), pozOliN[which]);
+	int which = 11;
+	//printf("\nPrzetwarzanie zestawu %s, o maksymalnej dlugosci %d\n", negLos[which].c_str(), negLosN[which]);
 	
 	n = pozOliN[which];
 	char tmp[5000];
@@ -641,17 +641,17 @@ int main()
 	goalFunction(n);
 	
 	int id = findTheBestIndividual();
-	outfile << pozOli[which].c_str() << ";" << pozOliN[which] << ";" << population[0].second << ";" << numberOfOligonucleotydes[0]<<";"<< numberOfOligonucleotydes[0] * 100 / (oligonucleotydes.size() - pozOliNB[which])<<"\n";
-	printf("Najlepszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d  %d\n", population[0].second, numberOfOligonucleotydes[0], n, numberOfOligonucleotydes[0]*100/(oligonucleotydes.size() - pozOliNB[which]));
+	outfile << pozOli[which].c_str() << ";" << pozOliN[which] << ";" << 0 << ";" << population[0].second << ";" << numberOfOligonucleotydes[0]<<";"<< numberOfOligonucleotydes[0] * 100 / (oligonucleotydes.size() - pozOliNB[which])<<"\n";
+	//printf("Najlepszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d  %d\n", population[0].second, numberOfOligonucleotydes[0], n, numberOfOligonucleotydes[0]*100/(oligonucleotydes.size()));
 
-	for (int j = 1; j<100; j++) {
+	for (int j = 1; j<200; j++) {
 		crossing(population.size());
 		mutation(u);
 		goalFunction(n);
 		int id = findTheBestIndividual();
 		if(j%10 == 0)
-			outfile << pozOli[which].c_str() << ";" << pozOliN[which] << ";" << population[id].second << ";" << numberOfOligonucleotydes[id] << ";" << numberOfOligonucleotydes[id] * 100 / (oligonucleotydes.size() - pozOliNB[which]) << "\n";
-		printf("Najlepszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d  %d\n", population[id].second, numberOfOligonucleotydes[id], n, numberOfOligonucleotydes[id] * 100 / (oligonucleotydes.size() - pozOliNB[which]));
+			outfile << pozOli[which].c_str() << ";" << pozOliN[which] << ";" << j << ";" << population[id].second << ";" << numberOfOligonucleotydes[id] << ";" << numberOfOligonucleotydes[id] * 100 / (oligonucleotydes.size() - pozOliNB[which]) << "\n";
+		//printf("Najlepszy wynik ma wartosci %d ktory zawiera %d olinukleotydow do dlugosci %d  %d\n", population[id].second, numberOfOligonucleotydes[id], n, numberOfOligonucleotydes[id] * 100 / (oligonucleotydes.size()));
 
 	}
 
@@ -659,6 +659,6 @@ int main()
 	//clear();
 
 	
-	system("pause");
+	//system("pause");
     return 0;
 }
