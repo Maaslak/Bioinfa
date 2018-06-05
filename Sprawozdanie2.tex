@@ -18,7 +18,7 @@
 \begin{document}
 \maketitle
 \section{Zmiany w algorytmie}  
-Po zaimplementowaniu algorytmu i zauważeniu jego słabych osiągnięć, zdecydowano by wprowadzić zmiany w zastosowanym podejściu algorytmicznym. Poniżej w kilku sekcjach omówiono te cześci algorytmu, które zostały zastąpione. Dodatkowo wybrane zostało kryterium stopu jako 200 iteracji algorytmu.
+Po zaimplementowaniu algorytmu i zauważeniu jego słabych osiągnięć, zdecydowano by wprowadzić zmiany w zastosowanym podejściu algorytmicznym. Poniżej w kilku sekcjach omówiono te cześci algorytmu, które zostały zastąpione.
 \subsection{Kodowanie}
 Zmiana w kodowaniu polega na traktowaniu osobnika jako cykliczny, spowodowało to że każdy osobnik jest zbiórem rozwiązań z przesuniętym początkiem o jeden oligonukleotyd. Nie pogorszyło to złożoności obliczeniowej wyznaczania funkcji celu, która pozostała równa $O(n)$, gdzie $n$ jest długością osobnika. Pozwoliło natomiast na traktowanie jednego rozwiązania jako zbioru $n$ różnych rozwiązań i korzystania z tej części osobnika o najlepszym przystosowaniu.
 \subsection{Mutacje}
@@ -26,6 +26,8 @@ W funkcji odpowiedzialnej za dokonanie mutacji osobnika została zastosowana odr
 \subsection{Krzyżowanie}
 Krzyżowanie zaczyna się w dokładnie taki sam sposób jak w pierwotnym algorytmie, a mianowicie od pewnego wylosowanego przedziału przepisuje się oligonukleotydy do nowo tworzonego osobnika (kopiuje wycinek i wkleja go do nowego osobnika) z wybranego osobnika z populacji rodzicielskiej. Następnie uzupełniany jest koniec osobnika wartościami z innego osobnika z populacji rodzicielskiej, uważając oczywiście by dany oligonukleotyd nie został powtórzony. W ten sam sposób zostaje uzupełniony początek osobnika z nowej populacji. \\ Wszystkie oligonukleotydy które nie zostały dodane wstawiane są, w miejsca w których ich koszt będzie najmniejszy. Motywacją było przyspierzenie zbieżności algorytmu oraz zachowanie losowości dzięki losowemu doborowi punktów krzyżowania. Tym samy dając lepsze rozwiązania w krótszym czasie przetwarzania jak i dając możliwość na opuszczenie minimów lokalnych.
 \section{Testy}
+Testy wykonano na dwóch wariantach zaproponowanej hybrydy algorytmu genetycznego, jednym z nich było startowanie od losowej populacji początkowej, drugim natomiast początkowe wygenerowania jednego osobnika za pomocą algorytmu zachłannego, który ma na przyspieszyć zbierzność pozostałych rozwiązań do optimum.
+Dodatkowo wybrane zostało kryterium stopu jako 200 iteracji algorytmu.
 W testach mierzono upływ czasu, jak i zmiany jakości rozwiązań co 10 iteracji algorytmu, aby pokazać poprawę rozwiązań wraz z kolejnymi iteracjami. Jako jakość rozwiązania przyjęto stosunek ilości oligonukleotydów rozwiązania uzyskanego przez algorytm do ilości oligonukleotydów w rozwiązaniu optymalnym. Jakość wyrażamy w procentach.
 \subsection{Wyniki algorytmu dla błędów negatywnych, losowych}
 \begin{figure}[H]
@@ -78,7 +80,7 @@ W przypadku błędów negatywnych na końcach sekwencji wyniki są zbliżone do 
 \includegraphics[width=0.5\textwidth]{Czaspoz-los-greedy2.png}
 \caption{Porównanie algorytmu dla błędów pozytywnych, losowych bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od czasu przetwarzania}
 \end{figure}
-Dla błędów pozytywnych losowych nasz algorytm nie działa już tak dobrze. Jak widać algorytm bez początku zachłannego uzyskuje średnie wyniki w okolicach 60\%. Jest do dość słaby wynik. Dodatkowo algorytm z początkiem zachłannym tylko pogarsza swoje wyniki po lepszym wyniku zachłannym, żeby ostatecznie dojść do prawie takiego samego wyniku jak algorytm bez początku zachłannego.  
+Dla błędów pozytywnych losowych algorytm uzyskuje średnie wyniki w okolicach 60\%. Dodatkowo algorytm z początkiem zachłannym tylko pogarsza swoje wyniki po lepszym wyniku zachłannym, żeby ostatecznie dojść do prawie tak samo dobrego wyniku jak algorytm bez początku zachłannego. Jest to związane z przyjęciem w metodzie mutacji kryterium wyboru oligonukleotydu na podstawie najsłabszego dopasowania. Powodem pogarszania wyniku jest fakt, że w przypadku błędów pozytywnych często wiąrze się to z wyborem oligonukleotydu będącego tym, nie występującym w oryginalnej sekwencji.
 \subsection{Wyniki algorytmu dla błędów pozytywnych, na końcach sekwencji}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{poz-oli1.png}
@@ -94,8 +96,9 @@ Dla błędów pozytywnych losowych nasz algorytm nie działa już tak dobrze. Ja
 \includegraphics[width=0.5\textwidth]{Czaspoz-oli-greedy2.png}
 \caption{Porównanie algorytmu dla błędów pozytywnych na końcach sekwencji bez (po lewej stronie) oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny (po prawej stronie) w zależności od czasu przetwarzania}
 \end{figure}
-Ostatnią kategorią są błędy pozytywne z przekłamaniami na końcach oligonukleotydów. Jak widać radzi on sobie odrobinę lepiej niż dla błędów pozutywnych losowych, dodatkowo algorytm z rozpoczęciem zachłannym nie maleje aż tak bardzo (algorytm zachłanny ma większe problemy z optymalnym ustawieniem i jego wykonanie nie powoduje od razu ustawienia pierwszej iteracji na wysokości 90-95\%, a nieco niżej na 70-80\%).
+Ostatnią kategorią są błędy pozytywne z przekłamaniami na końcach oligonukleotydów. Jak widać radzi on sobie odrobinę lepiej niż dla błędów pozytywnych losowych, dodatkowo algorytm z rozpoczęciem zachłannym nie pogarsza tak mocno rozwiązań (algorytm zachłanny ma większe problemy z optymalnym ustawieniem i jego wykonanie nie powoduje od razu ustawienia pierwszej iteracji na wysokości 90-95\%, a nieco niżej na 70-80\%).
 \section{Wnioski}
+Zaproponowana hybryda algorytmu genetycznego wykazuje lepsze działanie w przypadku występowania błędów negatywnych. Początkowe pogorszenie rozwiązań w przypadku korzystania z rozwiązania wygenerowanego przez algorytm zachłanny wynika z zastosowania wymienionej metody mutacji, jak i z faktu, że do populacji początkowej dołączany jest tylko jeden osobnik wygenerowany przez algorytm zachłanny. O ile w przypadku błędów pozytywnych następuje szybka poprawa rozwiązania, o tyle własności błędów negatywnych nie pozwalają na poprawę rozwiązań przez przyjętą metodę mutacji, a krzyżowanie nie jest w stanie sprawić, że rozwiązanie wyjdzie z optimum lokalnego. Dodatkowo można wyciągnąć wniosek, że klasyczny algorytm genetyczny nie nadaje się do rozwiązywania problemu sekwencjonowania DNA ze względu na to, że jest to problem, w którym jest bardzo niskie prawdopodobieństwo na wylosowanie ułożenia oligonukleotydów w optymalny sposób. Kluczowe więc jest odpowiednie dokonanie modyfikacji poszczególnych  założeń klasycznego algorytmu genetycznego w celu przyspieszenia zbiegania rozwiązań do optimum. W wypadku prezentowanej metody ukazały się jej zarówno mocne, jak i słabe strony, które skłaniają do kolejnej modyfikacji załorzeń przyjętych na etapie projektowania algorytmu. Propozycją modyfikacji, jest umożliwienie odrzucenia oligonukleotydów słabo pasujących do rozwiązania w celu pozbycia się potencjalnych błędów pozytywnych. Powodowałoby to jednak konieczność przyjęcia innego kodowania rozwiązania, lub próba odmiennego jego interpretowania.
 \end{document}
 
 
