@@ -20,7 +20,7 @@
 \section{Zmiany w algorytmie}  
 Po zaimplementowaniu algorytmu i zauważeniu jego słabych osiągnięć, zdecydowano by wprowadzić zmiany w zastosowanym podejściu algorytmicznym. Poniżej w kilku sekcjach omówiono te cześci algorytmu, które zostały zastąpione.
 \subsection{Kodowanie}
-Zmiany w kodowaniu zostały wprowadzone by nie dopuścić do %TODO
+Zmiana w kodowaniu polega na traktowaniu osobnika jako cykliczny, spowodowało to że każdy osobnik jest zbiórem rozwiązań z przesuniętym początkiem o jeden oligonukleotyd. Nie pogorszyło to złożoności obliczeniowej wyznaczania funkcji celu, która pozostała równa $O(n)$, gdzie $n$ jest długością osobnika. Pozwoliło natomiast na traktowanie jednego rozwiązania jako zbioru $n$ różnych rozwiązań i korzystania z tej części osobnika o najlepszym przystosowaniu.
 \subsection{Mutacje}
 W funkcji odpowiedzialnej za dokonanie mutacji osobnika została zastosowana odrębna idea ze względu na to, że rozwiązania pozostawały w minimach lokalnych. Przyjęto konwencję, w której każdy z oligonukleotydów ma wygenerowane koło fortuny. Dla koła fortuny oligonukleotydu $A$, każdy z oligonukleotydów otrzymuje wycinek koła w zależności od funkcji kosztu między nim a osobnikiem $A$ (Dla kosztu maksymalnego, nie otrzymuje wycinka). Gdy następuje mutacja osobnika wybierany jest oligoukleotyd $a$ o największym koszcie będącym sumą kosztów z sąsiednimi oligonukleotydami oraz losowany jest oligonukleotyd $b$ przy użyciu wygenerowanego koła fortuny przed którym umieszczany zostaje oligonukleotyd $a$. Dzięki temu algorytm przemieszcza oligonukleotyd o najgorszym dopasowaniu w co najmniej tak dobre miejsce preferując miejsca lepszego dopasowania.
 \subsection{Krzyżowanie}
@@ -49,8 +49,7 @@ Krzyżowanie zaczyna się w dokładnie taki sam sposób jak w pierwotnym algoryt
 \includegraphics[width=0.5\textwidth]{Czasneg-los-greedy4.png}
 \caption{Porównanie algorytmu dla błędów negatywnych, losowych bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
 \end{figure}
-Jak widać, dla błędów negatywnych losowych algorytm otrzymuje rozwiązanie o średniej dokładności 90\%. W algorytmie z początkowym algorytmem zachłannym (wykresy po prawej) widać że otrzymuje on średnio lepsze wyniki z prostej przyczyny początkowego uszeregowania które ma bardzo dobrą jakość rozwiązania. Powodem tego są rodzaje testów, które bardzo dobrze są rozwiązywane przez algorytm zachłanny. Nie zmienia to jednak faktu, że algorytm bez początkowego rozpoczęcia zachłannego uzyskuje podobne wyniki, a funkcja poprawnie zbiega do celu. \\
-Czas przetwarzania waha się tu między 2 a 4 sekundami co jest dobrym wynikiem.
+Jak widać, dla błędów negatywnych losowych algorytm otrzymuje rozwiązanie o średniej dokładności 90\%. W algorytmie z początkowym algorytmem zachłannym (wykresy po prawej) widać że otrzymuje on średnio lepsze wyniki z prostej przyczyny początkowego uszeregowania które ma bardzo dobrą jakość rozwiązania. Powodem tego są rodzaje testów, które bardzo dobrze są rozwiązywane przez algorytm zachłanny. Nie zmienia to jednak faktu, że algorytm bez początkowego rozpoczęcia zachłannego uzyskuje podobne wyniki, a funkcja poprawnie zbiega do celu.
 \subsection{Wyniki algorytmu dla błędów negatywnych na końcach sekwencji}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{neg-pow1.png}
@@ -62,7 +61,7 @@ Czas przetwarzania waha się tu między 2 a 4 sekundami co jest dobrym wynikiem.
 \includegraphics[width=0.5\textwidth]{Czasneg-pow-greedy1.png}
 \caption{Porównanie algorytmu dla błędów negatywnych na końcach sekwencji bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
 \end{figure}
-W przypadku  błędów negatywnych na końcach sekwencji wyniki są zbliżone do błędów negatywnych losowych i zachowują taką samą własność. \\Dla tego przypadku średni czas przetwarzania jest już trochę dłuższy - 6 sek. 
+W przypadku  błędów negatywnych na końcach sekwencji wyniki są zbliżone do błędów negatywnych losowych i zachowują taką samą własność.
 \subsection{Wyniki algorytmu dla błędów pozytywnych, losowych}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{poz-los1.png}
@@ -78,7 +77,7 @@ W przypadku  błędów negatywnych na końcach sekwencji wyniki są zbliżone do
 \includegraphics[width=0.5\textwidth]{Czaspoz-los-greedy2.png}
 \caption{Porównanie algorytmu dla błędów pozytywnych, losowych bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
 \end{figure}
-Dla błędów pozytywnych losowych nasz algorytm nie działa już tak dobrze. Jak widać algorytm bez początku zachłannego uzyskuje średnie wyniki w okolicach 60\%. Jest do dość słaby wynik. Dodatkowo algorytm z początkiem zachłannym tylko pogarsza swoje wyniki po lepszym wyniku zachłannym, żeby ostatecznie dojść do prawie takiego samego wyniku jak algorytm bez początku zachłannego. \\Dodatkowo poza słabym wynikiem rozwiązania wzrasta nam potrzebny czas na jego wykonanie aż do maksymalnie 25 sekund. Średnio jednak testy te zajmowały 11.3 sekundy.
+Dla błędów pozytywnych losowych nasz algorytm nie działa już tak dobrze. Jak widać algorytm bez początku zachłannego uzyskuje średnie wyniki w okolicach 60\%. Jest do dość słaby wynik. Dodatkowo algorytm z początkiem zachłannym tylko pogarsza swoje wyniki po lepszym wyniku zachłannym, żeby ostatecznie dojść do prawie takiego samego wyniku jak algorytm bez początku zachłannego.  
 \subsection{Wyniki algorytmu dla błędów pozytywnych, na końcach sekwencji}
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{poz-oli1.png}
@@ -94,9 +93,8 @@ Dla błędów pozytywnych losowych nasz algorytm nie działa już tak dobrze. Ja
 \includegraphics[width=0.5\textwidth]{Czaspoz-oli-greedy2.png}
 \caption{Porównanie algorytmu dla błędów pozytywnych na końcach sekwencji bez oraz z wykorzystanym osobnikiem wygenerownym przez algorytm zachłanny w zależności od czasu przetwarzania}
 \end{figure}
-Ostatnią kategorią są błędy pozytywne z przekłamaniami na końcach oligonukleotydów. Jak widać radzi on sobie odrobinę lepiej niż dla błędów pozutywnych losowych, dodatkowo algorytm z rozpoczęciem zachłannym nie maleje aż tak bardzo (algorytm zachłanny ma większe problemy z optymalnym ustawieniem i jego wykonanie nie powoduje od razu ustawienia pierwszej iteracji na wysokości 90-95\%, a nieco niżej na 70-80\%). Czasy przetwarzania tych testów były znacząco krótsze od swoich poprzedników i wynosiły średnio 5 sekund.
+Ostatnią kategorią są błędy pozytywne z przekłamaniami na końcach oligonukleotydów. Jak widać radzi on sobie odrobinę lepiej niż dla błędów pozutywnych losowych, dodatkowo algorytm z rozpoczęciem zachłannym nie maleje aż tak bardzo (algorytm zachłanny ma większe problemy z optymalnym ustawieniem i jego wykonanie nie powoduje od razu ustawienia pierwszej iteracji na wysokości 90-95\%, a nieco niżej na 70-80\%).
 \section{Wnioski}
-
 \end{document}
 
 
