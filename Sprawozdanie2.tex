@@ -18,11 +18,13 @@
 \begin{document}
 \maketitle
 \section{Zmiany w algorytmie}  
-Po zaimplementowaniu algorytmu i zauważeniu jego słabych osiągnięć, doszliśmy do wniosku by wprowadzić zmiany w naszym algorytmie. 
-\subsection{Mutacje}
-\subsection{Krzyżowanie}
-Krzyżowanie zaczyna się w dokładnie taki sam sposób jak było w naszym pierwotnym algorytmie, a mianowicie od pewnego wylosowanego przedziału przepisuje oligonukleotydy do nowo tworzonego osobnika (kopiuje wycinek i wkleja go do nowego osobnika) z wybranego osobnika z populacji rodzicielskiej. Następnie uzupełniany jest koniec osobnika wartościami z innego osobnika z populacji rodzicielskiej, uważając oczywiście by dany oligonukleotyd nie został powtórzony. W ten sam sposób zostaje uzupełniony początek osobnika z nowej populacji. \\ Wszystkie oligonukleotydy które nie zostały dodane (na wskutek dodawania ich z innego osobnika który za punktem cięcia mógł mieć oligounkloeotyd taki sam jak drugi osobnik użyty do krzyżowania pomiędzy punktami cięcia) zostają dodane, każdy osobno, w miejsce w którym funkcja celu będzie najniższa. Dzięki takiemu nakierowaniu, nadal mieliśmy pewną dużą losowość przez krzyżowanie między losowymi punktami cięcia (która jest ważna w algorytmie genetycznym), a jednocześnie algorytm szybciej zbiegał do wartości optymalnych, tym samy dając lepsze rezultaty w krótszym czasie.
+Po zaimplementowaniu algorytmu i zauważeniu jego słabych osiągnięć, zdecydowano by wprowadzić zmiany w zastosowanym podejściu algorytmicznym. Poniżej w kilku sekcjach omówiono te cześci algorytmu, które zostały zastąpione.
 \subsection{Kodowanie}
+Zmiany w kodowaniu zostały wprowadzone by nie dopuścić do %TODO
+\subsection{Mutacje}
+W funkcji odpowiedzialnej za dokonanie mutacji osobnika została zastosowana odrębna idea ze względu na to, że rozwiązania pozostawały w minimach lokalnych. Przyjęto konwencję, w której każdy z oligonukleotydów ma wygenerowane koło fortuny. Dla koła fortuny oligonukleotydu $A$, każdy z oligonukleotydów otrzymuje wycinek koła w zależności od funkcji kosztu między nim a osobnikiem $A$ (Dla kosztu maksymalnego, nie otrzymuje wycinka). Gdy następuje mutacja osobnika wybierany jest oligoukleotyd $a$ o największym koszcie będącym sumą kosztów z sąsiednimi oligonukleotydami oraz losowany jest oligonukleotyd $b$ przy użyciu wygenerowanego koła fortuny przed którym umieszczany zostaje oligonukleotyd $a$. Dzięki temu algorytm przemieszcza oligonukleotyd o najgorszym dopasowaniu w co najmniej tak dobre miejsce preferując miejsca lepszego dopasowania.
+\subsection{Krzyżowanie}
+Krzyżowanie zaczyna się w dokładnie taki sam sposób jak w pierwotnym algorytmie, a mianowicie od pewnego wylosowanego przedziału przepisuje się oligonukleotydy do nowo tworzonego osobnika (kopiuje wycinek i wkleja go do nowego osobnika) z wybranego osobnika z populacji rodzicielskiej. Następnie uzupełniany jest koniec osobnika wartościami z innego osobnika z populacji rodzicielskiej, uważając oczywiście by dany oligonukleotyd nie został powtórzony. W ten sam sposób zostaje uzupełniony początek osobnika z nowej populacji. \\ Wszystkie oligonukleotydy które nie zostały dodane wstawiane są, w miejsca w których ich koszt będzie najmniejszy. Motywacją było przyspierzenie zbieżności algorytmu oraz zachowanie losowości dzięki losowemu doborowi punktów krzyżowania. Tym samy dając lepsze rozwiązania w krótszym czasie przetwarzania jak i dając możliwość na opuszczenie minimów lokalnych.
 \section{Testy}
 \subsection{Wyniki algorytmu dla błędów negatywnych, losowych}
 \begin{figure}[H]
